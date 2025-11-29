@@ -23,7 +23,8 @@ Assumptions:
 
 Notes:
 
-* Commands shown are **examples** and should be edited as needed.
+* This guide is meant to be used along with the official handbook, when the handbook is needed. It is very detailed, and it is easy to get lost in the details. This guide is meant to hide some of the complexity and verbosity of the handbook to ease the process and so that important details are not overlooked.
+* Commands shown are **examples** and should be edited if needed.
 * 
 
 ------------------------------------------------
@@ -121,19 +122,31 @@ Notes:
        password: ****
        sudo -i
 
-#. Determine what disk to install to and partition the disk. Use ``gdisk`` *to* partition, ``mkfs.*`` and ``mkswap`` to create file systems, and ``mount`` and ``swapon`` to mount them.
+#. Determine what disk to install to and setup the disk.
 
-   +----+-----+-------------+------------+-----------------+
-   |Code|Label|Size         |filesystem  |mount point      |
-   +====+=====+=============+============+=================+
-   |8300|root |100 GB       |ext4        |/mnt/gentoo      |
-   +----+-----+-------------+------------+-----------------+
-   |EF00|efi  |200 MB       |fat32       |/mnt/gentoo/efi  |
-   +----+-----+-------------+------------+-----------------+
-   |8200|swap |4 GB         |(mkswap)    |<none>           |
-   +----+-----+-------------+------------+-----------------+
-   |8300|home |<remainder>  |ext4        |/mnt/gentoo/home |
-   +----+-----+-------------+------------+-----------------+
+   a. Use ``lsblk`` and/or ``dmesg | grep "\(sd[a-z]\)\|scsi [0-9]"`` to determine the drive to install to
+   #. Use ``gdisk`` to partition
+   #. Use ``mkfs.fat32`` to create efi partition. If the machine has another disk that already has an EFI partition, then provided it isn't full, it can (and should) be used for the gentoo install - and no new EFI partition needs to be made. Just be sure to have a backup of that partition (and ideally all other existing partitions that are to be kept).
+   #. Use ``mkfs.ext4`` to create root and home partitions. the ``xfs`` format is
+   #. Use ``mkswap`` to create swap partition
+   #. Use ``mount`` to mount all but swap
+   #. Use ``swapon`` to swap
+   #. Note: All partition values shown below are for example only.  
+   #. Note: Rows are in the order that they can be mounted.
+
+\ 
+
+   +----+-----+-------------+------------+-----------------+-----------------+
+   |Code|Label|Size         |filesystem  |partition        |mount point      |
+   +====+=====+=============+============+=================+=================+
+   |8300|root |100 GB       |ext4        |/dev/sdb3        |/mnt/gentoo      |
+   +----+-----+-------------+------------+-----------------+-----------------+
+   |EF00|efi  |200 MB       |fat32       |/dev/sdb1        |/mnt/gentoo/efi  |
+   +----+-----+-------------+------------+-----------------+-----------------+
+   |8300|home |<remainder>  |ext4        |/dev/sdb4        |/mnt/gentoo/home |
+   +----+-----+-------------+------------+-----------------+-----------------+
+   |8200|swap |4 GB         |swap        |/dev/sdb2        |<none>           |
+   +----+-----+-------------+------------+-----------------+-----------------+
 
 #. Download the Stage3 file
 
@@ -151,7 +164,7 @@ Notes:
        current-stage3-amd64-openrc/stage3-amd64-openrc-20251116T161545Z.tar.xz.asc
 
 
-   #. Verify iso
+   #. Verify the stage3 file
 
       ::
 

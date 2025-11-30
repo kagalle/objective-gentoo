@@ -13,6 +13,7 @@ Contraints:
 * OpenRC
 * Desktop profile and matching Stage3 file
 * Install binary packages whenever possible
+* Use EFI-stub for boot loading
 * XFCE4
 * 
 
@@ -221,7 +222,7 @@ Notes:
        GENTOO_MIRRORS="https://mirrors.rit.edu/gentoo"
        FEATURES="getbinpkg binpkg-request-signature"
        ACCEPT_LICENSE="@FREE @BINARY-REDISTRIBUTABLE"
-       USE="-systemd"
+       USE="-systemd ugrd dist-kernel"
 
    #. Run ``getuto``
    #. Set binhist mirror.
@@ -271,14 +272,51 @@ Notes:
        eselect locale list
        eselect locale set 5
 
-#. Periodic updates (not now)
+#. Bootloader
 
    ::
 
-    emerge --ask --verbose --update --deep @world
-    emerge --ask --depclean
+    emerge --ask --verbose sys-kernel/installkernel
+    mkdir -p /efi/EFI/Gentoo
+
+#. Firmware and Kernel (``intel-microcode`` is only needed for Intel CPUs)
+
+   ::
+
+    emerge --ask --verbose sys-kernel/gentoo-sources
+    emerge --ask --verbose linux-firmware sof-firmware
+    emerge --ask --verbose intel-mirocode                     # if needed
+    emerge --ask --verbose sys-kernel/gentoo-kernel-bin
+
+
+
+
+
+    
+#. Portage notes (not needed now)
+
+   a. Update all packages
+
+      ::
+
+       emerge --ask --verbose --update --deep @world
+       emerge --ask --depclean
+
+   b. List all manually installed packages
+
+      ::
+
+       {TODO}
+
+   c. Remove a package
+
+      ::
+
+       emerge --ask --verbose --depclean package-to-remove
+       emerge --ask --verbose --depclean
 
 
 99. attic
 
+  a. ``emerge --ask --verbose ``
 

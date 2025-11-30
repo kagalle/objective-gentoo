@@ -230,9 +230,9 @@ Notes:
       #. Use ``links`` to verify URL for binary packages that match the ``desktop`` profile.
       #. Edit ``/etc/portage/binrepos.conf/gentobinhost.conf`` accordingly...
 
-      ::
+         ::
 
-       sync-uri = https://mirrors.rit.edu/gentoo/releases/amd64/binpackages/23.0/x86-64-v3
+          sync-uri = https://mirrors.rit.edu/gentoo/releases/amd64/binpackages/23.0/x86-64-v3
 
    #. Set rsync mirror - this is used to update the portage tree (which was initially done by emerge-webrsync). Create/edit ``/etc/portage/repos.conf`` accordingly...
 
@@ -243,10 +243,41 @@ Notes:
 
    #. Update ebuild repository and portage app
 
+      ::
+
+       emerge --sync
+       emerge --ask --verbose --oneshot sys-apps/portage
+
+#. Set time-zone
+
    ::
 
-    emerge --sync
-    emerge --ask --verbose --oneshot sys-apps/portage
+    cd /etc
+    ln -sf ../usr/share/zoneinfo/America/New_York localtime
+
+#. Locale
+
+   a. Generation - edit file so it has (only) ``en_US.UTF-8 UTF-8`` uncommented.
+
+      ::
+
+       nano locale.gen
+       locale-gen
+
+   b. Selection - use ``eselect`` to select the ``en_US.UTF-8`` profile
+
+      ::
+
+       eselect locale list
+       eselect locale set 5
+
+#. Periodic updates (not now)
+
+   ::
+
+    emerge --ask --verbose --update --deep @world
+    emerge --ask --depclean
+
 
 99. attic
 

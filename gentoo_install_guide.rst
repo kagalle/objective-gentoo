@@ -206,7 +206,7 @@ Notes:
 
     eselect profile list | more
     eselect profile set 3
-    
+
 #. Initial configuring of portage. See handbook for more details on each.
 
    a. Edit ``/etc/portage/make.conf`` and add these lines...
@@ -224,7 +224,7 @@ Notes:
        USE="-systemd"
 
    #. Run ``getuto``
-   #. Set binhist mirror. 
+   #. Set binhist mirror.
 
       i. Determine if you machine supports "v3". Run ``ld.so --help`` and if it returns saying the x86-64-v3 is supported, then use the ``x86-64-v3`` variant for in the binpackages URL below, otherwise use ``x86-64``.
       #. Use ``links`` to verify URL for binary packages that match the ``desktop`` profile.
@@ -234,11 +234,19 @@ Notes:
 
        sync-uri = https://mirrors.rit.edu/gentoo/releases/amd64/binpackages/23.0/x86-64-v3
 
-#. Update ebuild repository
+   #. Set rsync mirror - this is used to update the portage tree (which was initially done by emerge-webrsync). Create/edit ``/etc/portage/repos.conf`` accordingly...
+
+      ::
+
+       [gentoo]
+       sync-uri = rsync://rsync5.us.gentoo.org/gentoo-portage
+
+   #. Update ebuild repository and portage app
 
    ::
 
     emerge --sync
+    emerge --ask --verbose --oneshot sys-apps/portage
 
 99. attic
 

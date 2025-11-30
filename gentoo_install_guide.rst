@@ -233,7 +233,7 @@ Notes:
 
          ::
 
-          sync-uri = https://mirrors.rit.edu/gentoo/releases/amd64/binpackages/23.0/x86-64-v3
+          sync-uri = https://mirrors.rit.edu/gentoo/releases/amd64/binpackages/23.0/x86-64
 
    #. Set rsync mirror - this is used to update the portage tree (which was initially done by emerge-webrsync). Create/edit ``/etc/portage/repos.conf`` accordingly...
 
@@ -284,6 +284,10 @@ Notes:
    ::
 
     emerge --ask --verbose sys-kernel/gentoo-sources
+    eselect kernel list
+    eselect kernel set 1
+    eselect kernel list
+    emerge --ask --verbose --update --deep --newuse @world
     emerge --ask --verbose linux-firmware sof-firmware
     emerge --ask --verbose intel-mirocode                     # if needed
     emerge --ask --verbose sys-kernel/gentoo-kernel-bin

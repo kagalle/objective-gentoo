@@ -3,6 +3,13 @@ Gentoo Install
 
 Notes for installing Gentoo
 
+
+This guide is meant to be used along with the official Gentoo handbook and other Gentoo documentation (e.g. `EFI Stub <https://wiki.gentoo.org/wiki/EFI_stub/en>`_.
+
+As the handbook is very detailed, it is easy to "miss the forest in the trees." This guide is meant to severly limit installation choices and hide some of the complexity and verbosity of the handbook to ease the process, so that important details are not overlooked.
+
+Commands shown are **examples** and should be edited if needed.
+
 Contraints:
 
 * x86-64 (AMD64 or Intel 64)
@@ -21,12 +28,6 @@ Assumptions:
 
 * Partitioning method
 * DHCP used for networking
-* 
-
-Notes:
-
-* This guide is meant to be used along with the official handbook, when the handbook is needed. It is very detailed, and it is easy to get lost in the details. This guide is meant to hide some of the complexity and verbosity of the handbook to ease the process and so that important details are not overlooked.
-* Commands shown are **examples** and should be edited if needed.
 * 
 
 ------------------------------------------------
@@ -215,14 +216,18 @@ Notes:
       i. Adjust the mirror URL to match the mirror you chose earlier
       #. Use binary packages whenever possible
       #. Accept binary licenses
-      #. Add can't-stand items to USE varilable. For best results with binary packages, minimize the number of USE flags you set, but make exceptions when needed.  To see a list of current flags
+      #. USE flags - for best results with binary packages, minimize the number of USE flags you set, but some need to be set. USE flags are used as a way to configure / choose between options, in addition to configuring how software should be built.
+
+         - ``-systemd`` - systemd should never be pulled in as a dependancy for another package
+         - ``dist-kernel`` - needed when using ``gentoo-kernel-bin``
+         - ``dracut``, ``efistub`` - boot system using an EFI stub (instead of using grub). Both flags needed for ``installkernel`` which configures the boot items after a kernel is installed.
 
       ::
 
        GENTOO_MIRRORS="https://mirrors.rit.edu/gentoo"
        FEATURES="getbinpkg binpkg-request-signature"
        ACCEPT_LICENSE="@FREE @BINARY-REDISTRIBUTABLE"
-       USE="-systemd ugrd dist-kernel"
+       USE="-systemd dracut dist-kernel efistub"
 
    #. Run ``getuto``
    #. Set binhist mirror.
@@ -271,6 +276,7 @@ Notes:
 
        eselect locale list
        eselect locale set 5
+       . ./profile
 
 #. Bootloader
 
@@ -283,14 +289,12 @@ Notes:
 
    ::
 
-    emerge --ask --verbose sys-kernel/gentoo-sources
-    eselect kernel list
-    eselect kernel set 1
-    eselect kernel list
-    emerge --ask --verbose --update --deep --newuse @world
     emerge --ask --verbose linux-firmware sof-firmware
     emerge --ask --verbose intel-mirocode                     # if needed
     emerge --ask --verbose sys-kernel/gentoo-kernel-bin
+    eselect kernel list
+    eselect kernel set 1
+    eselect kernel list
 
 
 
@@ -310,7 +314,7 @@ Notes:
 
       ::
 
-       {TODO}
+       cat /var/lib/portage/world
 
    c. Remove a package
 
@@ -324,3 +328,4 @@ Notes:
 
   a. ``emerge --ask --verbose ``
 
+    # emerge --ask --verbose --update --deep --newuse @world

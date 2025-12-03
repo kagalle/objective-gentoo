@@ -4,7 +4,7 @@ Gentoo Install
 Notes for installing Gentoo
 
 
-This guide is meant to be used along with the official Gentoo handbook and other Gentoo documentation (e.g. `EFI Stub <https://wiki.gentoo.org/wiki/EFI_stub/en>`_.
+This guide is meant to be used along with the official Gentoo handbook and other Gentoo documentation (e.g. `EFI Stub <https://wiki.gentoo.org/wiki/EFI_stub/en>`_).
 
 As the handbook is very detailed, it is easy to "miss the forest in the trees." This guide is meant to severly limit installation choices and hide some of the complexity and verbosity of the handbook to ease the process, so that important details are not overlooked.
 
@@ -289,18 +289,44 @@ Assumptions:
 
    ::
 
-    emerge --ask --verbose linux-firmware sof-firmware
-    emerge --ask --verbose intel-mirocode                     # if needed
+    emerge --ask --verbose linux-firmware sof-firmware         # --newuse, --changed-use if needed
+    emerge --ask --verbose intel-microcode                     # if needed
     emerge --ask --verbose sys-kernel/gentoo-kernel-bin
     eselect kernel list
     eselect kernel set 1
     eselect kernel list
 
+#. Use ``lsblk`` to create ``/etc/fstab`` using UUIDs of each partition.
 
+   ::
 
+    UUID=402E-DDEB                             /efi            vfat            umask=0077,tz=UTC        1 2
+    UUID=1651c6f4-c3fa-441a-b0d4-6509baf19cdd  /               ext4            defaults,noatime         0 1
+    UUID=71222dab-818a-4b34-9d07-3a5cd3a6f9a4  none            swap            sw                       0 0
 
+#. Set the hostname
 
-    
+   ::
+
+    echo claude > /etc/hostname
+
+#. Install and setup DHCP for network
+
+   ::
+
+    emerge --ask --verbose dhcpcd
+    rc-update add dhcpcd default
+    rc-service dhcpcd start
+
+#. Edit ``/etc/hosts``
+
+   ::
+
+    127.0.0.1       claude.birchtreefarm.internal claude localhost
+    ::1             claude.birchtreefarm.internal claude localhost
+
+#. Set root password and create regular user2
+
 #. Portage notes (not needed now)
 
    a. Update all packages

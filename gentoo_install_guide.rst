@@ -10,10 +10,14 @@ As the handbook is very detailed, it is easy to "miss the forest in the trees." 
 
 Commands shown are **examples** and should be edited if needed.
 
+The steps do not need to be done in one session, start to finish.
+
+   a. During steps `Create bootable media`_
+
 Contraints:
 
 * x86-64 (AMD64 or Intel 64)
-* UEFI
+* UEFI only
 * Install using Gentoo minimal install iso on a thumbdrive created on an existing desktop linux install with a browser available
 * Downloads from my nearest mirror site
 * Plain GPT partitions with / (root), /efi, swap (and optionally /home)
@@ -32,11 +36,16 @@ Assumptions:
 
 ------------------------------------------------
 
-1. Create bootable media using an existing Linux installation
+Create bootable media
+=====================
+
+Using an existing linux installation, create a removable thumb-drive that can boot the destination machine. This live-CD environment will contain the scripts and utilities needed to prepare the destination machine to boot Gentoo directly. Existing machines with other operating systems can be used to create this live-CD, but the steps would be somewhat different.
+ 
+1. asdf
 
    a. Manually find your nearest mirror - go to ``https://www.gentoo.org/downloads/mirrors/`` and make note of (copy to clip-board) the https URL of the mirror you choose.
 
-   #. Go to the nearest mirror
+   #. In a browser, go to the nearest mirror
 
       ::
 
@@ -77,9 +86,16 @@ Assumptions:
        ls -l install-amd64-minimal-20251116T161545Z.iso
        sudo cat /dev/sdb | cmp --bytes 813670400 install-amd64-minimal-20251123T153051Z.iso
 
-#. Boot the thumbdrive using whatever BIOS keystroke is needed (Del, F3, etc). If given the choice, choose the thumbdrive name that is prefixed with 'UEFI'.
+#. Boot the machine and enter the BIOS setup (Del, F3, etc)
 
-#. Configure networking - either wireless or wired.
+   a. Change the settings for legacy BIOS boot to support UEFI only. We want to use UEFI and doing this will remove all of the legacy boot options from the boot menu selection, which we don't want to be booting anyway. (recommended)
+   #. Find the setting for "Windows" vs "Other OS" and choose "Windows". This will enable additional options for secure boot which you may want.
+
+#. Boot the thumbdrive \***
+
+   Use whatever BIOS keystroke is needed (Del, F3, etc - some machines will have a F-key assigned to get to the boot menu directly, others have override boot options in the "Exit..." menu of setup. Choose the option to boot the thumbdrive.
+
+#. Configure networking - either wireless or wired \***
 
    ::
 
@@ -107,7 +123,7 @@ Assumptions:
        ip link
        dhcpcd enp3s0
 
-#. Facilitate being able to do remainder of install remotely (optional)
+#. Facilitate being able to do remainder of install remotely (optional) \***
 
    a. Add normal user
 
@@ -117,13 +133,17 @@ Assumptions:
        passwd ken
        rc-service sshd start
 
-   #. Note the IP given given to ``livecd`` in the above step, then ssh to the livecd machine from the machine you wish to continue working from.
+   #. Connect remotely to the machine being installed (optional)
 
-      If you have a local DHCP server / name server that the live CD gets an IP address from (such as technitium)  then...
+      Note the IP given given to ``livecd`` in the above step, then ssh to the livecd machine from the machine you wish to continue working from.
+
+      If you have a local DHCP server / name server that the live CD gets an IP address from (such as Technitium)  then ``livecd`` may be registered as a host on the network. Otherwise you have to use the machine's IP address.
+
+      Each time that the livecd is booted, the ssh service will generate a new key to identify itself, so the StrictHostKeyChecking option is to allow connection in this case.
 
       ::
 
-       ssh ken@livecd
+       ssh -o StrictHostKeyChecking=no ken@livecd
        password: ****
        sudo -i
 
@@ -184,17 +204,17 @@ Assumptions:
 
        tar xpvf stage3-*.tar.xz --xattrs-include='*.*' --numeric-owner
 
-#. Copy DNS information to new system
+#. Copy DNS information to new system \***
 
    ::
 
     cp --dereference /etc/resolv.conf /mnt/gentoo/etc/
 
-#. Chroot into the new system
+#. Change-root into the new system \***
 
    ::
 
-     arch-chroot /mnt/gentoo
+    arch-chroot /mnt/gentoo
 
 #. Create portage database
 
@@ -203,8 +223,8 @@ Assumptions:
     emerge-webrsync
 
 #. Profile selection - if not already set correctly, change the profile to ``/linux/amd64/xx.x/desktop`` which matches the desktop stage3 file you are using. Use the profile number of the item listed.
-
    ::
+
 
     eselect profile list | more
     eselect profile set 3

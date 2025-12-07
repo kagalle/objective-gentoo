@@ -43,9 +43,9 @@ Assumptions:
 Create bootable media
 =====================
 
-Using an existing linux installation, create a removable thumb-drive that can boot the destination machine. This live-CD environment will contain the scripts and utilities needed to prepare the destination machine to boot Gentoo directly. Existing machines with other operating systems can be used to create this live-CD, but the steps would be somewhat different. The name "live-CD" matches the assigned host-name when the system is running - it could be any sort of removable media, like a CD-ROM or a flash-drive.
+Using an existing linux installation, create a removable thumb-drive that can boot the destination machine. This live-CD environment will contain the scripts and utilities needed to prepare the destination machine to boot Gentoo directly. Existing machines with other operating systems can be used to create this live-CD, but the steps would be somewhat different. The name "live-CD" matches the assigned host-name when the system is running - it can be any sort of removable media, like a CD-ROM or a flash-drive.
  
-1. Manually find your nearest mirror - go to ``https://www.gentoo.org/downloads/mirrors/`` and make note of (copy to clip-board) the https URL of the mirror you choose.
+#. Manually find your nearest mirror - go to ``https://www.gentoo.org/downloads/mirrors/`` and make note of the https URL of the mirror you choose.
 
 #. In a browser, go to the nearest mirror
 
@@ -91,16 +91,20 @@ Using an existing linux installation, create a removable thumb-drive that can bo
 Boot the live-CD
 ================
 
-#. Boot the machine and enter the BIOS setup (Del, F3, etc)
+#. BIOS setup
+
+   Boot the machine and enter the BIOS setup (Del, F1, F10, Esc, etc.)
 
    a. Change the settings for legacy BIOS boot to support UEFI only. We want to use UEFI and doing this will remove all of the legacy boot options from the boot menu selection, which we don't want to be booting anyway. (recommended)
    #. Find the setting for "Windows" vs "Other OS" and choose "Windows". This will enable additional options for secure boot which you may want.
 
 #. Boot the thumb-drive \***
 
-   Use whatever BIOS keystroke is needed (Del, F3, etc - some machines will have a F-key assigned to get to the boot menu directly, others have override boot options in the "Exit..." menu of setup. Choose the option to boot the thumbdrive.
+   Use whatever BIOS keystroke is needed (Del, F1, F10, Esc, etc. - some machines will have a F-key assigned to get to the boot menu directly, others have override boot options in the "Exit..." menu of setup. Choose the option to boot the thumbdrive.
 
-#. Configure networking - either wireless or wired \***
+#. Configure networking \***
+
+   Configure either wireless or wired. Wired is easier and generally faster if you have a wired connection.
 
    ::
 
@@ -128,7 +132,9 @@ Boot the live-CD
        ip link
        dhcpcd enp3s0
 
-#. Facilitate being able to do remainder of install remotely (optional) \***
+#. Remove install (optional) \***
+
+   This facilitatea being able to do the remainder of install remotely.
 
    a. Add normal user
 
@@ -152,7 +158,9 @@ Boot the live-CD
        password: ****
        sudo -i
 
-#. Determine what disk to install to and setup the disk.
+#. Disk setup
+
+   Determine what disk to install to and setup the disk.
 
    a. Use ``lsblk`` and/or ``dmesg | grep "\(sd[a-z]\)\|scsi [0-9]"`` to determine the drive to install to
    #. Use ``gdisk`` to partition
@@ -161,8 +169,12 @@ Boot the live-CD
    #. Use ``mkswap`` to create swap partition
    #. Use ``mount`` to mount all but swap
    #. Use ``swapon`` to swap
-   #. Note: All partition values shown below are for example only.
-   #. Note: Partitions should be created in order of partition number (e.g. sdb1, sdb2, sdb3, sdb4). Rows below are in the order that they can be mounted.
+
+   Notes:
+
+   * All partition values shown below are for example only.
+   * Partitions should be created in order of partition number (e.g. sdb1, sdb2, sdb3, sdb4). Rows below are in the order that they can be mounted.
+   * The root partition size is typical, but can be reduced if space is not available. Generally "steal" from ``home`` until there is no extra available, then reduce ``root`` as needed afterward.  The minimimum root size is about 8 GB.
 
    \ 
 
@@ -203,11 +215,15 @@ Boot the live-CD
        gpg --auto-key-locate=clear,nodefault,wkd --locate-key releng@gentoo.org
        gpg --verify stage3-amd64-openrc-20251116T161545Z.tar.xz.asc
 
-   #. Install the stage3 file
+   #. Install the stage3 file on the filesystem
 
       ::
 
        tar xpvf stage3-*.tar.xz --xattrs-include='*.*' --numeric-owner
+
+Inside the change-root
+===========================
+
 
 #. Copy DNS information to new system \***
 
@@ -305,6 +321,8 @@ Boot the live-CD
 
 #. Bootloader
 
+   ``installkernel`` with the flags set will keep the EFI settings updated when kernels are updated.
+
    ::
 
     emerge --ask --verbose sys-kernel/installkernel
@@ -350,7 +368,22 @@ Boot the live-CD
     127.0.0.1       claude.birchtreefarm.internal claude localhost
     ::1             claude.birchtreefarm.internal claude localhost
 
-#. Set root password and create regular user2
+#. User setup
+
+   a. Set root password
+
+      ::
+
+       passwd
+
+   #. Create a regular user
+
+      ::
+
+       useradd -G users,wheel ken
+
+
+
 
 #. Portage notes (not needed now)
 

@@ -10,9 +10,13 @@ As the handbook is very detailed, it is easy to "miss the forest in the trees." 
 
 Commands shown are **examples** and should be edited if needed.
 
-The steps do not need to be done in one session, start to finish.
+The steps do not need to be done in one session, start to finish. Steps needed to pause and restart for a given point in the process:
 
-   a. During steps `Create bootable media`_
+a. In `Create bootable media`_ - pick up at the point where you left off.
+#. In `Boot the live-CD`_ - redo all steps marked with ``***`` up to the point where you left off.
+#. In
+
+
 
 Contraints:
 
@@ -39,59 +43,60 @@ Assumptions:
 Create bootable media
 =====================
 
-Using an existing linux installation, create a removable thumb-drive that can boot the destination machine. This live-CD environment will contain the scripts and utilities needed to prepare the destination machine to boot Gentoo directly. Existing machines with other operating systems can be used to create this live-CD, but the steps would be somewhat different.
+Using an existing linux installation, create a removable thumb-drive that can boot the destination machine. This live-CD environment will contain the scripts and utilities needed to prepare the destination machine to boot Gentoo directly. Existing machines with other operating systems can be used to create this live-CD, but the steps would be somewhat different. The name "live-CD" matches the assigned host-name when the system is running - it could be any sort of removable media, like a CD-ROM or a flash-drive.
  
-1. asdf
+1. Manually find your nearest mirror - go to ``https://www.gentoo.org/downloads/mirrors/`` and make note of (copy to clip-board) the https URL of the mirror you choose.
 
-   a. Manually find your nearest mirror - go to ``https://www.gentoo.org/downloads/mirrors/`` and make note of (copy to clip-board) the https URL of the mirror you choose.
+#. In a browser, go to the nearest mirror
 
-   #. In a browser, go to the nearest mirror
+   ::
 
-      ::
+    http://mirrors.rit.edu/gentoo/releases/amd64/autobuilds/current-install-amd64-minimal/
 
-       http://mirrors.rit.edu/gentoo/releases/amd64/autobuilds/current-install-amd64-minimal/
+#. Download latest iso and its asc file. There will several older ``.asc`` files along with the current ``.iso`` and ``.iso.asc``, which is the ones you want (right click, save link as...).
 
-   #. Download latest iso and its asc file. There will several older ``.asc`` files along with the current ``.iso`` and ``.iso.asc``, which is the ones you want (right click, save link as...).
+   ::
 
-      ::
-
-       install-amd64-minimal-20251116T161545Z.iso
-       install-amd64-minimal-20251116T161545Z.iso.asc
+    install-amd64-minimal-20251116T161545Z.iso
+    install-amd64-minimal-20251116T161545Z.iso.asc
 
 
-   #. Verify iso
+#. Verify iso
 
-      ::
+   ::
 
-       gpg --auto-key-locate=clear,nodefault,wkd --locate-key releng@gentoo.org
-       gpg --verify install-amd64-minimal-20251116T161545Z.iso.asc
+    gpg --auto-key-locate=clear,nodefault,wkd --locate-key releng@gentoo.org
+    gpg --verify install-amd64-minimal-20251116T161545Z.iso.asc
 
-   #. Insert thumb drive and find its name - make sure you have the correct drive
+#. Insert thumb drive and find its name - make sure you have the correct drive
 
-      ::
+   ::
 
-       sudo dmesg | grep "\(sd[a-z]\)\|scsi [0-9]"
+    sudo dmesg | grep "\(sd[a-z]\)\|scsi [0-9]"
 
-   #. Write the iso image
+#. Write the iso image
 
-      ::
+   ::
 
-       sudo dd if=install-amd64-minimal-20251116T161545Z.iso of=/dev/sdb bs=4096 status=progress
-       sudo sync
+    sudo dd if=install-amd64-minimal-20251116T161545Z.iso of=/dev/sdb bs=4096 status=progress
+    sudo sync
 
-   #. Verify data on thumbdrive. Remove and reinsert the thumbdrive first. Get size of file in bytes from ``ls``, use that in ``cmp`` which should return without any response (if the data on the drive doesn't match, it will tell you).
+#. Verify data on thumbdrive. Remove and reinsert the thumbdrive first. Get size of file in bytes from ``ls``, use that in ``cmp`` which should return without any response (if the data on the drive doesn't match, it will tell you).
 
-      ::
+   ::
 
-       ls -l install-amd64-minimal-20251116T161545Z.iso
-       sudo cat /dev/sdb | cmp --bytes 813670400 install-amd64-minimal-20251123T153051Z.iso
+    ls -l install-amd64-minimal-20251116T161545Z.iso
+    sudo cat /dev/sdb | cmp --bytes 813670400 install-amd64-minimal-20251123T153051Z.iso
+
+Boot the live-CD
+================
 
 #. Boot the machine and enter the BIOS setup (Del, F3, etc)
 
    a. Change the settings for legacy BIOS boot to support UEFI only. We want to use UEFI and doing this will remove all of the legacy boot options from the boot menu selection, which we don't want to be booting anyway. (recommended)
    #. Find the setting for "Windows" vs "Other OS" and choose "Windows". This will enable additional options for secure boot which you may want.
 
-#. Boot the thumbdrive \***
+#. Boot the thumb-drive \***
 
    Use whatever BIOS keystroke is needed (Del, F3, etc - some machines will have a F-key assigned to get to the boot menu directly, others have override boot options in the "Exit..." menu of setup. Choose the option to boot the thumbdrive.
 

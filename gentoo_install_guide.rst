@@ -25,12 +25,14 @@ Contraints:
 * Install using Gentoo minimal install iso on a thumbdrive created on an existing desktop linux install with a browser available
 * Downloads from my nearest mirror site
 * Plain GPT partitions with / (root), /efi, swap (and optionally /home)
+* ext4 for file-systems
 * OpenRC
 * Desktop profile and matching Stage3 file
 * Install binary packages whenever possible
 * Use EFI-stub for boot loading
 * XFCE4
-* 
+* DHCP for network setup
+* The choice of system logger, cron, time sync
 
 Assumptions:
 
@@ -132,7 +134,7 @@ Boot the live-CD
        ip link
        dhcpcd enp3s0
 
-#. Remove install (optional) \***
+#. Remote install (optional) \***
 
    This facilitatea being able to do the remainder of install remotely.
 
@@ -144,7 +146,7 @@ Boot the live-CD
        passwd ken
        rc-service sshd start
 
-   #. Connect remotely to the machine being installed (optional)
+   #. Connect remotely to the machine being installed.
 
       Note the IP given given to ``livecd`` in the above step, then ssh to the livecd machine from the machine you wish to continue working from.
 
@@ -158,17 +160,22 @@ Boot the live-CD
        password: ****
        sudo -i
 
-#. Disk setup
+#. Partition disk and create file systems
 
-   Determine what disk to install to and setup the disk.
+   A basic partition scheme is shown below.
 
    a. Use ``lsblk`` and/or ``dmesg | grep "\(sd[a-z]\)\|scsi [0-9]"`` to determine the drive to install to
-   #. Use ``gdisk`` to partition
+   #. Use ``gdisk`` to partition the drive
    #. Use ``mkfs.fat -F 32`` to create efi partition. If the machine has another disk that already has an EFI partition, then provided it isn't full, it can (and should) be used for the gentoo install - and no new EFI partition needs to be made. Just be sure to have a backup of that partition (and ideally all other existing partitions that are to be kept). The 1 GB size is sufficient for booting multiple systems, though 200 MB is enough for the Gentoo install.
    #. Use ``mkfs.ext4`` to create root and home partitions. The ``xfs`` format is now preferred over using ext4 - adjust as desired.
    #. Use ``mkswap`` to create swap partition
+
+#. Mount the file systems \***
+
+   The partitions for the new machine need to be mounted under ``/mnt/gentoo`` in the live-CD environment
+
    #. Use ``mount`` to mount all but swap
-   #. Use ``swapon`` to swap
+   #. Use ``swapon`` to enable the swap partition
 
    Notes:
 
@@ -221,11 +228,11 @@ Boot the live-CD
 
        tar xpvf stage3-*.tar.xz --xattrs-include='*.*' --numeric-owner
 
-Inside the change-root
+Change-root
 ===========================
 
 
-#. Copy DNS information to new system \***
+#. Copy DNS information to new system
 
    ::
 
@@ -319,27 +326,9 @@ Inside the change-root
        eselect locale set 5
        . ./profile
 
-#. Bootloader
+#. Update fstab
 
-   ``installkernel`` with the flags set will keep the EFI settings updated when kernels are updated.
-
-   ::
-
-    emerge --ask --verbose sys-kernel/installkernel
-    mkdir -p /efi/EFI/Gentoo
-
-#. Firmware and Kernel (``intel-microcode`` is only needed for Intel CPUs)
-
-   ::
-
-    emerge --ask --verbose linux-firmware sof-firmware         # --newuse, --changed-use if needed
-    emerge --ask --verbose intel-microcode                     # if needed
-    emerge --ask --verbose sys-kernel/gentoo-kernel-bin
-    eselect kernel list
-    eselect kernel set 1
-    eselect kernel list
-
-#. Use ``lsblk`` to create ``/etc/fstab`` using UUIDs of each partition.
+   Run ``blkid >> /etc/fstab`` to add the information needed, then edit that information down to the below format using ``nano /etc/fstab``.
 
    ::
 
@@ -357,9 +346,9 @@ Inside the change-root
 
    ::
 
-    emerge --ask --verbose dhcpcd
+    emerge --ask --verbose net-misc/dhcpcd
     rc-update add dhcpcd default
-    rc-service dhcpcd start
+    rc-service dhcpcd start             # ***
 
 #. Edit ``/etc/hosts``
 
@@ -381,6 +370,62 @@ Inside the change-root
       ::
 
        useradd -G users,wheel ken
+
+#. Setup a logger, cron, and ssh, bash completion, time sync
+
+   Note: the emerge line is all one line
+
+   ::
+
+    emerge --ask --verbose app-admin/sysklogd sys-process/cronie app-shells/bash-completion \
+       net-misc/chrony sys-fs/e2fsprogs sys-fs/dosfstools
+    rc-update add sysklogd default
+    rc-update add cronie default
+    rc-update add sshd default
+    rc-update add chronyd default
+
+#. Bootloader
+
+   Steps to all booting and to keep the EFI settings updated when kernels are updated.
+
+   #. Unmask EFI stub booting
+
+      Create ``/etc/portage/package.accept_keywords/installkernel`` and fill with:
+
+      ::
+
+       sys-kernel/installkernel
+       sys-boot/uefi-mkconfig
+       app-emulation/virt-firmware
+       sys-kernel/dracut
+
+    #. Install ``installkernel``
+
+       ::
+
+        emerge --ask --verbose sys-kernel/installkernel
+        mkdir -p /efi/EFI/Gentoo
+
+
+.. Left off here
+
+#. Firmware and Kernel (``intel-microcode`` is only needed for Intel CPUs)
+
+   ::
+
+    emerge --ask --verbose linux-firmware sof-firmware         # --newuse, --changed-use if needed
+    emerge --ask --verbose intel-microcode                     # if needed
+
+    emerge --ask --verbose --config sys-kernel/gentoo-kernel-bin
+    eselect kernel list
+    eselect kernel set 1
+    eselect kernel list
+
+    emerge --ask --verbose sys-boot/efibootmgr
+    efibootmgr --create --disk //dev/sdb --part 1 --label "gentoo --loader "\EFI\Gentoo\bzImage.efi"
+
+..
+
 
 
 

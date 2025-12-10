@@ -371,7 +371,9 @@ Change-root
 
        useradd -G users,wheel ken
 
-#. Setup a logger, cron, and ssh, bash completion, time sync
+#. System services
+
+   Setup a logger, cron, and ssh, bash completion, time sync
 
    Note: the emerge line is all one line
 
@@ -384,9 +386,7 @@ Change-root
     rc-update add sshd default
     rc-update add chronyd default
 
-#. Bootloader
-
-   Steps to all booting and to keep the EFI settings updated when kernels are updated.
+#. Kernel
 
    #. Unmask EFI stub booting
 
@@ -399,32 +399,35 @@ Change-root
        app-emulation/virt-firmware
        sys-kernel/dracut
 
-    #. Install ``installkernel``
+   #. Install kernel (binary)
 
-       ::
+      ::
 
-        emerge --ask --verbose sys-kernel/installkernel
-        mkdir -p /efi/EFI/Gentoo
+       emerge --ask --verbose sys-kernel/installkernel
+       mkdir -p /efi/EFI/Gentoo
+
+       emerge --ask --verbose linux-firmware sof-firmware
+       emerge --ask --verbose intel-microcode                     # only needed for Intel CPUs
+
+       emerge --ask --verbose --config sys-kernel/gentoo-kernel-bin
+       eselect kernel list
+       eselect kernel set 1
+       eselect kernel list
 
 
-.. Left off here
+#. Bootloader
 
-#. Firmware and Kernel (``intel-microcode`` is only needed for Intel CPUs)
+   Use ``efibootmgr`` to view the current configuration, remove entries, add entries, and change the boot order and timeout.
+   As before, use ``blkid`` to view current partitions and their IDs.
 
    ::
 
-    emerge --ask --verbose linux-firmware sof-firmware         # --newuse, --changed-use if needed
-    emerge --ask --verbose intel-microcode                     # if needed
-
-    emerge --ask --verbose --config sys-kernel/gentoo-kernel-bin
-    eselect kernel list
-    eselect kernel set 1
-    eselect kernel list
-
     emerge --ask --verbose sys-boot/efibootmgr
-    efibootmgr --create --disk //dev/sdb --part 1 --label "gentoo --loader "\EFI\Gentoo\bzImage.efi"
-
-..
+    efibootmgr
+    efibootmgr --create --disk //dev/sda --part 1 --label Gentoo \
+        --loader "\EFI\Gentoo\vmlinuz-6.12.58-gentoo-dist.efivmlinuz-6.12.58-gentoo-dist.efi" \
+        --unicode " root=UUID=1651c6f4-c3fa-441a-b0d4-6509baf19cdd initrd=\EFI\Gentoo\initramfs-6.12.58-gentoo-dist.img"
+    efibootmgr
 
 
 
@@ -455,6 +458,5 @@ Change-root
 
 99. attic
 
-  a. ``emerge --ask --verbose ``
-
-    # emerge --ask --verbose --update --deep --newuse @world
+#. emerge --ask --verbose --update --deep --newuse @world.
+#. --newuse, --changed-use if needed

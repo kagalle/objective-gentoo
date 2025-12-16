@@ -1,14 +1,22 @@
 Gentoo Install
 ##############
 
-Notes for installing Gentoo
+Notes for installing Gentoo as a basic desktop environment.
 
 
-This guide is meant to be used along with the official Gentoo handbook and other Gentoo documentation (e.g. `EFI Stub <https://wiki.gentoo.org/wiki/EFI_stub/en>`_).
+This guide is meant to be used along with the official `Gentoo handbook <https://wiki.gentoo.org/wiki/Handbook:AMD64/Full/Installation>`_ and other Gentoo documentation (e.g. `Gentoo mirrors <https://www.gentoo.org/support/rsync-mirrors>`_).
 
-As the handbook is very detailed, it is easy to "miss the forest in the trees." This guide is meant to severly limit installation choices and hide some of the complexity and verbosity of the handbook to ease the process, so that important details are not overlooked.
+As the handbook is very detailed, it is easy to "miss the forest in the trees." This guide is meant to limit installation choices and hide some of the complexity and verbosity of the handbook to ease the process, so that important details are not overlooked.
+
+Using the gentoo install media to install the system, but note that a current SystemResuceCD (on a flash-drive) can be very helpful, and can also be used to download and create the gentoo install media as described below.
+
+The details of partitioning the drive using gdisk are left out of this guide.
 
 Commands shown are **examples** and should be edited if needed.
+
+* `ken` is the username of the regular user
+* `claude` is the name of the machine being setup
+* `birchtreefarm.internal` is the name of the local network on the LAN
 
 The steps do not need to be done in one session, start to finish. Steps needed to pause and restart for a given point in the process:
 
@@ -21,31 +29,25 @@ a. In `Create bootable media`_ - pick up at the point where you left off.
 Contraints:
 
 * x86-64 (AMD64 or Intel 64)
-* UEFI only
+* Use UEFI to boot (as apposed to BIOS or CSM)
+* Use rEFInd as a boot manager (as apposed to trying to boot directly from UEFI or using Grub)
 * Install using Gentoo minimal install iso on a thumbdrive created on an existing desktop linux install with a browser available
 * Downloads from my nearest mirror site
-* Plain GPT partitions with / (root), /efi, swap (and optionally /home)
-* ext4 for file-systems
-* OpenRC
+* Plain GPT partitions with / (root), /boot (including efi), swap (and optionally /home). This is apposed to using any sort of raid or LVM.
+* OpenRC (as apposed to using systemd for init)
 * Desktop profile and matching Stage3 file
+* Use the pre-built Gentoo binary kernel
+* DHCP used for networking
 * Install binary packages whenever possible
-* Use EFI-stub for boot loading
-* XFCE4
 * DHCP for network setup
 * The choice of system logger, cron, time sync
-
-Assumptions:
-
-* Partitioning method
-* DHCP used for networking
-* 
 
 ------------------------------------------------
 
 Create bootable media
 =====================
 
-Using an existing linux installation, create a removable thumb-drive that can boot the destination machine. This live-CD environment will contain the scripts and utilities needed to prepare the destination machine to boot Gentoo directly. Existing machines with other operating systems can be used to create this live-CD, but the steps would be somewhat different. The name "live-CD" matches the assigned host-name when the system is running - it can be any sort of removable media, like a CD-ROM or a flash-drive.
+Using an existing linux installation (or a machine that is started using SystemRescueCD or similar), create a removable thumb-drive that can boot the destination machine. This live-CD environment will contain the scripts and utilities needed to prepare the destination machine to boot Gentoo directly. Existing machines with other operating systems can be used to create this live-CD, but the steps would be somewhat different. The name "live-CD" matches the assigned host-name when the system is running - it can be any sort of removable media, like a CD-ROM or a flash-drive.
  
 #. Manually find your nearest mirror - go to ``https://www.gentoo.org/downloads/mirrors/`` and make note of the https URL of the mirror you choose.
 
@@ -182,6 +184,7 @@ Boot the live-CD
    * All partition values shown below are for example only.
    * Partitions should be created in order of partition number (e.g. sdb1, sdb2, sdb3, sdb4). Rows below are in the order that they can be mounted.
    * The root partition size is typical, but can be reduced if space is not available. Generally "steal" from ``home`` until there is no extra available, then reduce ``root`` as needed afterward.  The minimimum root size is about 8 GB.
+   * The boot partition (where the kernels are stored and read when booting) is shared by the ESP (EFI system partition) which is what UEFI looks for when booting. The kernel needs to be available outside of root should the root file system be encrypted at some point. UEFI always looks for a ``EFI`` directory within the efi partition, and so doesn't need to be separate from `/boot`.
 
    \ 
 
@@ -190,7 +193,7 @@ Boot the live-CD
    +====+=====+=============+============+=================+=================+=================+
    |8300|root |100 GB       |ext4        |/dev/sdb3        |/mnt/gentoo      |root             |
    +----+-----+-------------+------------+-----------------+-----------------+-----------------+
-   |EF00|efi  |1 GB         |fat32       |/dev/sdb1        |/mnt/gentoo/efi  |efi              |
+   |EF00|efi  |1 GB         |fat32       |/dev/sdb1        |/mnt/gentoo/boot |efi_boot         |
    +----+-----+-------------+------------+-----------------+-----------------+-----------------+
    |8300|home |<remainder>  |ext4        |/dev/sdb4        |/mnt/gentoo/home |home             |
    +----+-----+-------------+------------+-----------------+-----------------+-----------------+
@@ -259,23 +262,30 @@ Change-root
 
 #. Initial configuring of portage. See handbook for more details on each.
 
-   a. Edit ``/etc/portage/make.conf`` and add these lines...
-
-      i. Adjust the mirror URL to match the mirror you chose earlier
-      #. Use binary packages whenever possible
-      #. Accept binary licenses
-      #. USE flags - for best results with binary packages, minimize the number of USE flags you set, but some need to be set. USE flags are used as a way to configure / choose between options, in addition to configuring how software should be built.
-
-         - ``-systemd`` - systemd should never be pulled in as a dependancy for another package
-         - ``dist-kernel`` - needed when using ``gentoo-kernel-bin``
-         - ``dracut``, ``efistub`` - boot system using an EFI stub (instead of using grub). Both flags needed for ``installkernel`` which configures the boot items after a kernel is installed.
+   a. Edit ``/etc/portage/make.conf`` and add/edit these lines...
 
       ::
 
        GENTOO_MIRRORS="https://mirrors.rit.edu/gentoo"
        FEATURES="getbinpkg binpkg-request-signature"
        ACCEPT_LICENSE="@FREE @BINARY-REDISTRIBUTABLE"
-       USE="-systemd dracut dist-kernel efistub"
+       USE="-systemd dist-kernel refind dracut"
+
+      i. Adjust the mirror URL to match the mirror you chose earlier
+      #. Use binary packages whenever possible
+      #. Accept binary licenses
+      #. USE flags - for best results with binary packages, minimize the number of USE flags you set, but some need to be set. USE flags have multiple purposes
+
+         * choose system options - this will cause certain software to be chosed and installed without explicitly installing it, as well as configuring that software
+         * configure / choose between options, in addition to configuring how software should be built.
+
+      Notes/explaination:
+
+      - ``-systemd`` - `systemd` should never be pulled in as a dependancy for another package
+      - ``dist-kernel`` - needed when using a pre-built binary kernel (`gentoo-kernel-bin`)
+      - ``dracut``, ``refind`` - boot system using an rEFInd (instead of using `grub`). Both flags needed for ``installkernel`` which configures the boot items after a kernel is installed.
+
+
 
    #. Run ``getuto``
    #. Set binhist mirror.
@@ -385,19 +395,10 @@ Change-root
     rc-update add cronie default
     rc-update add sshd default
     rc-update add chronyd default
+    rc-update add elogind default
+    rc-update add dbus default
 
 #. Kernel
-
-   #. Unmask EFI stub booting
-
-      Create ``/etc/portage/package.accept_keywords/installkernel`` and fill with:
-
-      ::
-
-       sys-kernel/installkernel
-       sys-boot/uefi-mkconfig
-       app-emulation/virt-firmware
-       sys-kernel/dracut
 
    #. Install kernel (binary)
 
@@ -417,23 +418,22 @@ Change-root
 
 #. Bootloader
 
-   Use ``efibootmgr`` to view the current configuration, remove entries, add entries, and change the boot order and timeout.
-   As before, use ``blkid`` to view current partitions and their IDs.
+   Install and configure the boot loader. As before, use ``blkid`` to view current partitions and their IDs. This UUID should be the UUID of the root (/) partition. `rEFInd` takes care of adding information for the initrd.
 
    ::
 
-    emerge --ask --verbose sys-boot/efibootmgr
-    efibootmgr
-    efibootmgr --create --disk //dev/sda --part 1 --label Gentoo \
-        --loader "\EFI\Gentoo\vmlinuz-6.12.58-gentoo-dist.efivmlinuz-6.12.58-gentoo-dist.efi" \
-        --unicode " root=UUID=1651c6f4-c3fa-441a-b0d4-6509baf19cdd initrd=\EFI\Gentoo\initramfs-6.12.58-gentoo-dist.img"
-    efibootmgr
+    emerge --ask --verbose sys-boot/refind
+    blkid >> /boot/refind_linux.conf
+    nano /boot/refind_linux.conf
+
+   Content
+
+   ::
+
+    "Gentoo" "root=UUID=1651c6f4-c3fa-441a-b0d4-6509baf19cdd"
 
 
-
-
-
-#. Portage notes (not needed now)
+#. Portage notes for installing/updating/removing software (not needed now)
 
    a. Update all packages
 
@@ -455,8 +455,48 @@ Change-root
        emerge --ask --verbose --depclean package-to-remove
        emerge --ask --verbose --depclean
 
+   d. verify currently installed packages if you have modified configurations or USE flags
 
-99. attic
+      ::
 
-#. emerge --ask --verbose --update --deep --newuse @world.
-#. --newuse, --changed-use if needed
+       emerge --ask --verbose --changed-use @world
+
+#. System services notes for managing services running in the background
+
+   a. list all services in `default` run-level
+
+      ::
+
+       rc-status default
+
+   b. list all services
+
+      ::
+
+       ls /etc/init.d
+
+   c. add service to run in the background
+
+      ::
+
+       rc-update add myservice default
+
+   d. start a system service (now, as apposed to when the system restarts)
+
+      ::
+
+       rc-service myservice start
+
+
+#. Desktop environment
+
+   First restart the machine without the install disk and make sure you boot into your new system.  Take care of any issues you see while it boots.
+
+   TODO...
+
+99. Additional items
+
+#. install tlp if on a laptop
+#. logs are in /var/log/messages
+
+

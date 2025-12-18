@@ -18,13 +18,7 @@ Commands shown are **examples** and should be edited if needed.
 * `claude` is the name of the machine being setup
 * `birchtreefarm.internal` is the name of the local network on the LAN
 
-The steps do not need to be done in one session, start to finish. Steps needed to pause and restart for a given point in the process:
-
-a. In `Create bootable media`_ - pick up at the point where you left off.
-#. In `Boot the live-CD`_ - redo all steps marked with ``***`` up to the point where you left off.
-#. In
-
-
+The steps do not need to be done in one session, start to finish. However if you are anywhere between `Boot the live-CD`_ and `Bootloader`_ you will need to redo all steps marked with ``***`` up to the point where you left off.
 
 Contraints:
 
@@ -283,8 +277,8 @@ Change-root
 
       - ``-systemd`` - `systemd` should never be pulled in as a dependancy for another package
       - ``dist-kernel`` - needed when using a pre-built binary kernel (`gentoo-kernel-bin`)
-      - ``dracut``, ``refind`` - boot system using an rEFInd (instead of using `grub`). Both flags needed for ``installkernel`` which configures the boot items after a kernel is installed.
-
+      - ``dracut`` - needed for `installkernel` which configures the boot items after a kernel is installed.
+      - ``introspection gstreamer colord gnome-online-accounts keyring`` is needed for `xfce4-meta` and `lxdm` install to be binary only
 
 
    #. Run ``getuto``
@@ -492,7 +486,8 @@ Change-root
 
    First restart the machine without the install disk and make sure you boot into your new system.  Take care of any issues you see while it boots.
 
-   TODO...
+   emerge `xfce4-meta` and `lxdm`
+
 
 99. Additional items
 

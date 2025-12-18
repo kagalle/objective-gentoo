@@ -1,10 +1,27 @@
 Gentoo Install
 ##############
 
-Notes for installing Gentoo as a basic desktop environment.
+\
+
+.. include:: <isonum.txt>
+
++------------+----------------------------------------------------------------------+
+|:Author:    | Kenneth Galle                                                        |
++------------+----------------------------------------------------------------------+
+|:Date:      | 12/18/2025                                                           |
++------------+----------------------------------------------------------------------+
+|:Version:   | v1.0.0                                                               |
++------------+----------------------------------------------------------------------+
+|:Copyright: || |copy| 2003 by John Q. Public, all rights reserved.                 |
+|            || No permission granted for use within machine learning (AI) systems. |
++------------+----------------------------------------------------------------------+
+
+----------------------------------------------------------
+Notes for installing Gentoo as a basic desktop environment
+----------------------------------------------------------
 
 
-This guide is meant to be used along with the official `Gentoo handbook <https://wiki.gentoo.org/wiki/Handbook:AMD64/Full/Installation>`_ and other Gentoo documentation (e.g. `Gentoo mirrors <https://www.gentoo.org/support/rsync-mirrors>`_).
+This guide is meant to be used along with the official `Gentoo handbook <https://wiki.gentoo.org/wiki/Handbook:AMD64/Full/Installation>`_ and other Gentoo documentation (e.g. `Gentoo mirrors <https://www.gentoo.org/support/rsync-mirrors>`_). There is no Gentoo installer and the handbook is hard for me to navigate just to get a machine up and running.
 
 As the handbook is very detailed, it is easy to "miss the forest in the trees." This guide is meant to limit installation choices and hide some of the complexity and verbosity of the handbook to ease the process, so that important details are not overlooked.
 
@@ -18,23 +35,61 @@ Commands shown are **examples** and should be edited if needed.
 * `claude` is the name of the machine being setup
 * `birchtreefarm.internal` is the name of the local network on the LAN
 
-The steps do not need to be done in one session, start to finish. However if you are anywhere between `Boot the live-CD`_ and `Bootloader`_ you will need to redo all steps marked with ``***`` up to the point where you left off.
+The steps do not need to be done in one session, start to finish. However if you are anywhere between `Boot the live-CD`_ and `Bootloader` you will need to redo all steps marked with ``***`` up to the point where you left off.
 
-Contraints:
+----------
+Contraints
+----------
 
 * x86-64 (AMD64 or Intel 64)
-* Use UEFI to boot (as apposed to BIOS or CSM)
+
+  This is the most common PC environment with 64 bit support. It also includes Apple Mac machines that use Intel processors, however to install there you need to do additional initial steps to the hardware itself.
+
+* Use UEFI to boot (as apposed to BIOS or Compatibility Mode)
+
+  Most recent hardware, within say 10 years or so should support booting using UEFI. Even more recent hardware only supports booting that way. The procedure for installing to hardware that only supports BIOS would differ somewhat and isn't included to improve clarity.
+
 * Use rEFInd as a boot manager (as apposed to trying to boot directly from UEFI or using Grub)
-* Install using Gentoo minimal install iso on a thumbdrive created on an existing desktop linux install with a browser available
+
+  I attempted to create this guide using EFI stub booting, ie booting directly from the hardware into Linux without a boot manager. However it proved to be needlessly complex to configure and rEFInd is a light-weight alternative to Grub that seems to work well for this.
+
+* Install media
+
+  Create the Gentoo-minimal-install thumbdrive using an existing linux desktop with a browser available. Other bootable media can be used, but Gentoo's media makes the process more straight forward. It is worth using this method. Also, see the note above about using SystemResuceCD as the existing linux desktop.
+
 * Downloads from my nearest mirror site
-* Plain GPT partitions with / (root), /boot (including efi), swap (and optionally /home). This is apposed to using any sort of raid or LVM.
-* OpenRC (as apposed to using systemd for init)
+
+  The biggest problem with mirror lists is that it isn't always clear where a mirror is located, and in some cases a site can be co-located in many locations. There is additional software that can help choosing, but my approach is to search for a university nearest your location.
+
+* Plain GPT partitions
+
+  Create partitions with ``/`` (root), ``/boot`` (including efi), swap (and optionally ``/home``). This is apposed to using any sort of raid or LVM.
+
+  GPT goes with UEFI. GPT is not supported with BIOS. MBR partitioning was used for BIOS (and optionally with compatibility mode) instead. GPT works well and has fewer restrictions and more features.
+
+* OpenRC (as apposed to using `systemd` for init)
+
+  This a "sensitive" topic - just check the Internet for articles over the last 10 years or more. My success with `systemd` has been less positive than without it, and so I choose to avoid it. This is based strictly my personal opinion. Systemd is a set of software that has enveloped much of the Linux system software. Note that the `init` process is only one area affected by `systemd`. Other areas, especially related to the desktop environment (e.g. elogind) are also `systemd` related, but usable outside of that environment. There are other examples like audio support `pulseaudio`. When I started with Linux, `systemd` didn't exist.
+
 * Desktop profile and matching Stage3 file
+
+  Choice of a profile makes a big difference on how large the final system is and how much software is installed by default. However, for a desktop machine, it is best to use the desktop profile, as all that additional software makes for a lot less manual configuration and a much smoother experience. It is well worth if you want to use a desktop enviroment, like in this case, `xfce4`.
+
 * Use the pre-built Gentoo binary kernel
+
+  Building a kernel, which is essentially what "Linux" is, can result in a much smaller and faster kernel. However the process is long and involved, and also highly specific to the hardware you're using. Just determining what specific hardware is baked into your hardware can be a significant challenge, and then finding the kernel configuration to match it along with side-effect configuration is not straight forward. I wish there was software that would allow you to scan your hardware and output a tailored kernel configuration - I have not come across any that I would consider a solution for this.
+
 * DHCP used for networking
+
+  The Gentoo install process requires connection to the Internet. Using DHCP is a well supported and straight-forward default. If something else is needed, it can be used instead (e.g. dial-up is mostly a thing of the past).
+
 * Install binary packages whenever possible
-* DHCP for network setup
+
+  Gentoo by default is a source-based distribution, where all of the software you install (outside of the software you get with the Stage3 file) is built from source. This doesn't fit well with the general purpose "I just need to get things done - machine," and binary support in Gentoo is good once configured.
+
 * The choice of system logger, cron, time sync
+
+  These are pieces of system software that run in the background. You can choose between different options. The choices below are a reasonable default.
 
 ------------------------------------------------
 
@@ -66,7 +121,7 @@ Using an existing linux installation (or a machine that is started using SystemR
     gpg --auto-key-locate=clear,nodefault,wkd --locate-key releng@gentoo.org
     gpg --verify install-amd64-minimal-20251116T161545Z.iso.asc
 
-#. Insert thumb drive and find its name - make sure you have the correct drive
+#. Insert thumb drive and find its name - make **absolutely sure** you have the correct drive
 
    ::
 
@@ -91,10 +146,10 @@ Boot the live-CD
 
 #. BIOS setup
 
-   Boot the machine and enter the BIOS setup (Del, F1, F10, Esc, etc.)
+   Boot the machine and enter the BIOS setup (by pressing Del, F1, F10, Esc, etc. when initial screen displays)
 
-   a. Change the settings for legacy BIOS boot to support UEFI only. We want to use UEFI and doing this will remove all of the legacy boot options from the boot menu selection, which we don't want to be booting anyway. (recommended)
-   #. Find the setting for "Windows" vs "Other OS" and choose "Windows". This will enable additional options for secure boot which you may want.
+   a. Change the settings for legacy BIOS boot to support UEFI only. We want to use UEFI and doing this will remove all of the legacy boot options from the boot menu selection, which we don't want to be booting anyway.
+   #. Find the setting for "Windows" vs "Other OS" and choose "Windows". This will enable additional options for secure boot which you may want later on.
 
 #. Boot the thumb-drive \***
 
@@ -102,7 +157,7 @@ Boot the live-CD
 
 #. Configure networking \***
 
-   Configure either wireless or wired. Wired is easier and generally faster if you have a wired connection.
+   Configure either wireless or wired. A wired connection is easier and generally faster if it is available.
 
    ::
 
@@ -132,7 +187,7 @@ Boot the live-CD
 
 #. Remote install (optional) \***
 
-   This facilitatea being able to do the remainder of install remotely.
+   This facilitatea being able to do the remainder of install remotely. This is commonly used, so I'm including it in the guide.
 
    a. Add normal user
 
@@ -162,7 +217,7 @@ Boot the live-CD
 
    a. Use ``lsblk`` and/or ``dmesg | grep "\(sd[a-z]\)\|scsi [0-9]"`` to determine the drive to install to
    #. Use ``gdisk`` to partition the drive
-   #. Use ``mkfs.fat -F 32`` to create efi partition. If the machine has another disk that already has an EFI partition, then provided it isn't full, it can (and should) be used for the gentoo install - and no new EFI partition needs to be made. Just be sure to have a backup of that partition (and ideally all other existing partitions that are to be kept). The 1 GB size is sufficient for booting multiple systems, though 200 MB is enough for the Gentoo install.
+   #. Use ``mkfs.fat -F 32`` to create boot/efi partition. If the machine already has an EFI partition, then it should be used for the gentoo install - and no new boot/EFI partition needs to be made. Just be sure to have a backup of that partition (and ideally all other existing partitions that are to be kept). The 1 GB size is sufficient for booting multiple systems, though 200 MB is enough for the Gentoo install.
    #. Use ``mkfs.ext4`` to create root and home partitions. The ``xfs`` format is now preferred over using ext4 - adjust as desired.
    #. Use ``mkswap`` to create swap partition
 
@@ -177,8 +232,8 @@ Boot the live-CD
 
    * All partition values shown below are for example only.
    * Partitions should be created in order of partition number (e.g. sdb1, sdb2, sdb3, sdb4). Rows below are in the order that they can be mounted.
-   * The root partition size is typical, but can be reduced if space is not available. Generally "steal" from ``home`` until there is no extra available, then reduce ``root`` as needed afterward.  The minimimum root size is about 8 GB.
-   * The boot partition (where the kernels are stored and read when booting) is shared by the ESP (EFI system partition) which is what UEFI looks for when booting. The kernel needs to be available outside of root should the root file system be encrypted at some point. UEFI always looks for a ``EFI`` directory within the efi partition, and so doesn't need to be separate from `/boot`.
+   * The root partition size is typical, but can be reduced if space is not available. Generally "steal" from ``home`` until there is no extra available, then reduce ``root`` as needed afterward.  The minimimum root size is about 10 GB.
+   * The boot partition (where the kernels are stored and read when booting) is shared by the ESP (EFI system partition) which is what UEFI looks for when booting. The kernel needs to be available outside of the root partition if it is encrypted at some point. UEFI always looks for a ``EFI`` directory within the efi partition, and so doesn't need to be separate from `/boot`.  That is: boot items live in ``/boot``, and efi items live in ``/boot/EFI``.
 
    \ 
 
@@ -226,7 +281,7 @@ Boot the live-CD
        tar xpvf stage3-*.tar.xz --xattrs-include='*.*' --numeric-owner
 
 Change-root
-===========================
+===========
 
 
 #. Copy DNS information to new system
@@ -426,6 +481,68 @@ Change-root
 
     "Gentoo" "root=UUID=1651c6f4-c3fa-441a-b0d4-6509baf19cdd"
 
+---------------
+New Environment
+---------------
+
+#. Restart
+
+   a. Restart the machine (without booting the install disk) and make sure you boot into your new system.
+
+      ::
+
+       /sbin/shutdown -r now
+
+   #. Take care of any issues you see while it boots.
+
+#. Desktop environment
+
+   a. Install the meta package for `xfce4` and `lxdm`
+
+      References
+
+      i. https://wiki.gentoo.org/wiki/Xfce
+      #. https://www.linuxfromscratch.org/blfs/view/11.3/x/lxdm.html
+
+      ::
+
+       emerge --ask --verbose xfce4-meta lxdm
+
+   #. Edit /etc/lxdm/lxdm.conf and uncomment the `session` line and change it to point to `/usr/bin/startxfce4`.
+
+      ::
+
+       nano /etc/lxdm/lxdm.conf
+
+   #. Add `xdm` to the default runlevel
+
+      ::
+
+       rc-update add xdm default
+
+   #. Configure `xdm` to use `lxdm`.  Edit `/etc/conf.d/display-manager` and change the `DISPLAYMANAGER` setting to `lxdm`.
+
+      ::
+
+       nano /etc/conf.d/display-manager
+
+   #. Restart - I find it easier to simply restart at this point. It verifies you can boot and end up logged into `xfce4`. Log in and open a terminal window.
+
+      At this point the disk useage should be approximately 8.1 G for `root` and under 100 M for `EFI`/`boot`.
+
+      ::
+
+       df -h
+
+      Checking memory use should show that swap space is available
+
+      ::
+
+       free
+
+-----
+Notes
+-----
 
 #. Portage notes for installing/updating/removing software (not needed now)
 
@@ -481,17 +598,11 @@ Change-root
 
        rc-service myservice start
 
+#. Misc.
 
-#. Desktop environment
-
-   First restart the machine without the install disk and make sure you boot into your new system.  Take care of any issues you see while it boots.
-
-   emerge `xfce4-meta` and `lxdm`
-
-
-99. Additional items
-
-#. install tlp if on a laptop
-#. logs are in /var/log/messages
+   #. install tlp if on a laptop
+   #. logs are in /var/log/messages
+   #. The Void Linux documentation is recomended. Void linux is a non-systemd distribution. https://docs.voidlinux.org/
+   #. When in a text terminal, you can switch between the available text terminals using `Alt F1` - `Alt F6`. If you boot into `xfce4`, you can switch to a text terminal using `Alt F1` - `Alt F6` and then back to the graphical environment using `Ctrl Alt F7`.
 
 

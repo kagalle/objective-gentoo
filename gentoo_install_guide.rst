@@ -1,5 +1,9 @@
+
+##############
 Gentoo Install
 ##############
+The Objective Gentoo Project
+----------------------------
 
 \
 
@@ -12,7 +16,8 @@ Gentoo Install
 +------------+----------------------------------------------------------------------+
 |:Version:   | v1.0.0                                                               |
 +------------+----------------------------------------------------------------------+
-|:Copyright: || |copy| 2003 by John Q. Public, all rights reserved.                 |
+|:License:   || |copy| 2003 by Kenenth Galle                                        |
+|            || Use allowed with the bounds of the GNU AGPLv3                       |
 |            || No permission granted for use within machine learning (AI) systems. |
 +------------+----------------------------------------------------------------------+
 

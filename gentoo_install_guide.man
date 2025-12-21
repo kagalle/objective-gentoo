@@ -1,0 +1,1012 @@
+'\" t
+.\" Man page generated from reStructuredText
+.\" by the Docutils 0.22.2 manpage writer.
+.
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.TH "Gentoo Install" "" "" ""
+.SH Name
+Gentoo Install \- The Objective Gentoo Project
+.sp
+
+.\" This data file has been placed in the public domain.
+.
+.\" Derived from the Unicode character mappings available from
+.\" <http://www.w3.org/2003/entities/xml/>.
+.\" Processed by unicode2rstsubs.py, part of Docutils:
+.\" <https://docutils.sourceforge.io>.
+.
+.TS
+box center;
+l|l.
+T{
+.INDENT 0.0
+.TP
+.B Author
+.UNINDENT
+T}	T{
+Kenneth Galle
+T}
+_
+T{
+.INDENT 0.0
+.TP
+.B Date
+.UNINDENT
+T}	T{
+12/18/2025
+T}
+_
+T{
+.INDENT 0.0
+.TP
+.B Version
+.UNINDENT
+T}	T{
+v1.0.0
+T}
+_
+T{
+.INDENT 0.0
+.TP
+.B License
+.UNINDENT
+T}	T{
+.nf
+© 2003 by Kenenth Galle
+Use allowed with the bounds of the GNU AGPLv3
+No permission granted for use within machine learning (AI) systems.
+.fi
+T}
+.TE
+.SH Notes for installing Gentoo as a basic desktop environment
+.sp
+This guide is meant to be used along with the official Gentoo handbook \%<https://\:wiki\:.gentoo\:.org/\:wiki/\:Handbook:AMD64/\:Full/\:Installation> and other Gentoo documentation (e.g. Gentoo mirrors \%<https://\:www\:.gentoo\:.org/\:support/\:rsync-mirrors>). There is no Gentoo installer and the handbook is hard for me to navigate just to get a machine up and running.
+.sp
+As the handbook is very detailed, it is easy to \(dqmiss the forest in the trees.\(dq This guide is meant to limit installation choices and hide some of the complexity and verbosity of the handbook to ease the process, so that important details are not overlooked.
+.sp
+Using the gentoo install media to install the system, but note that a current SystemResuceCD (on a flash\-drive) can be very helpful, and can also be used to download and create the gentoo install media as described below.
+.sp
+The details of partitioning the drive using gdisk are left out of this guide.
+.sp
+Commands shown are \fBexamples\fP and should be edited if needed.
+.INDENT 0.0
+.IP \(bu 2
+\fIken\fP is the username of the regular user
+.IP \(bu 2
+\fIclaude\fP is the name of the machine being setup
+.IP \(bu 2
+\fIbirchtreefarm.internal\fP is the name of the local network on the LAN
+.UNINDENT
+.sp
+The steps do not need to be done in one session, start to finish. However if you are anywhere between Boot the live\-CD and \fIBootloader\fP you will need to redo all steps marked with \fB***\fP up to the point where you left off.
+.SH Contraints
+.INDENT 0.0
+.IP \(bu 2
+x86\-64 (AMD64 or Intel 64)
+.sp
+This is the most common PC environment with 64 bit support. It also includes Apple Mac machines that use Intel processors, however to install there you need to do additional initial steps to the hardware itself.
+.IP \(bu 2
+Use UEFI to boot (as apposed to BIOS or Compatibility Mode)
+.sp
+Most recent hardware, within say 10 years or so should support booting using UEFI. Even more recent hardware only supports booting that way. The procedure for installing to hardware that only supports BIOS would differ somewhat and isn\(aqt included to improve clarity.
+.IP \(bu 2
+Use rEFInd as a boot manager (as apposed to trying to boot directly from UEFI or using Grub)
+.sp
+I attempted to create this guide using EFI stub booting, ie booting directly from the hardware into Linux without a boot manager. However it proved to be needlessly complex to configure and rEFInd is a light\-weight alternative to Grub that seems to work well for this.
+.IP \(bu 2
+Install media
+.sp
+Create the Gentoo\-minimal\-install thumbdrive using an existing linux desktop with a browser available. Other bootable media can be used, but Gentoo\(aqs media makes the process more straight forward. It is worth using this method. Also, see the note above about using SystemResuceCD as the existing linux desktop.
+.IP \(bu 2
+Downloads from my nearest mirror site
+.sp
+The biggest problem with mirror lists is that it isn\(aqt always clear where a mirror is located, and in some cases a site can be co\-located in many locations. There is additional software that can help choosing, but my approach is to search for a university nearest your location.
+.IP \(bu 2
+Plain GPT partitions
+.sp
+Create partitions with \fB/\fP (root), \fB/boot\fP (including efi), swap (and optionally \fB/home\fP). This is apposed to using any sort of raid or LVM.
+.sp
+GPT goes with UEFI. GPT is not supported with BIOS. MBR partitioning was used for BIOS (and optionally with compatibility mode) instead. GPT works well and has fewer restrictions and more features.
+.IP \(bu 2
+OpenRC (as apposed to using \fIsystemd\fP for init)
+.sp
+This a \(dqsensitive\(dq topic \- just check the Internet for articles over the last 10 years or more. My success with \fIsystemd\fP has been less positive than without it, and so I choose to avoid it. This is based strictly my personal opinion. Systemd is a set of software that has enveloped much of the Linux system software. Note that the \fIinit\fP process is only one area affected by \fIsystemd\fP\&. Other areas, especially related to the desktop environment (e.g. elogind) are also \fIsystemd\fP related, but usable outside of that environment. There are other examples like audio support \fIpulseaudio\fP\&. When I started with Linux, \fIsystemd\fP didn\(aqt exist.
+.IP \(bu 2
+Desktop profile and matching Stage3 file
+.sp
+Choice of a profile makes a big difference on how large the final system is and how much software is installed by default. However, for a desktop machine, it is best to use the desktop profile, as all that additional software makes for a lot less manual configuration and a much smoother experience. It is well worth if you want to use a desktop enviroment, like in this case, \fIxfce4\fP\&.
+.IP \(bu 2
+Use the pre\-built Gentoo binary kernel
+.sp
+Building a kernel, which is essentially what \(dqLinux\(dq is, can result in a much smaller and faster kernel. However the process is long and involved, and also highly specific to the hardware you\(aqre using. Just determining what specific hardware is baked into your hardware can be a significant challenge, and then finding the kernel configuration to match it along with side\-effect configuration is not straight forward. I wish there was software that would allow you to scan your hardware and output a tailored kernel configuration \- I have not come across any that I would consider a solution for this.
+.IP \(bu 2
+DHCP used for networking
+.sp
+The Gentoo install process requires connection to the Internet. Using DHCP is a well supported and straight\-forward default. If something else is needed, it can be used instead (e.g. dial\-up is mostly a thing of the past).
+.IP \(bu 2
+Install binary packages whenever possible
+.sp
+Gentoo by default is a source\-based distribution, where all of the software you install (outside of the software you get with the Stage3 file) is built from source. This doesn\(aqt fit well with the general purpose \(dqI just need to get things done \- machine,\(dq and binary support in Gentoo is good once configured.
+.IP \(bu 2
+The choice of system logger, cron, time sync
+.sp
+These are pieces of system software that run in the background. You can choose between different options. The choices below are a reasonable default.
+.UNINDENT
+
+.sp
+.ce
+----
+
+.ce 0
+.sp
+.SS Create bootable media
+.sp
+Using an existing linux installation (or a machine that is started using SystemRescueCD or similar), create a removable thumb\-drive that can boot the destination machine. This live\-CD environment will contain the scripts and utilities needed to prepare the destination machine to boot Gentoo directly. Existing machines with other operating systems can be used to create this live\-CD, but the steps would be somewhat different. The name \(dqlive\-CD\(dq matches the assigned host\-name when the system is running \- it can be any sort of removable media, like a CD\-ROM or a flash\-drive.
+.INDENT 0.0
+.IP 1. 3
+Manually find your nearest mirror \- go to \fBhttps://www.gentoo.org/downloads/mirrors/\fP and make note of the https URL of the mirror you choose.
+.IP 2. 3
+In a browser, go to the nearest mirror
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.EX
+http://mirrors.rit.edu/gentoo/releases/amd64/autobuilds/current\-install\-amd64\-minimal/
+.EE
+.UNINDENT
+.UNINDENT
+.IP 3. 3
+Download latest iso and its asc file. There will several older \fB\&.asc\fP files along with the current \fB\&.iso\fP and \fB\&.iso.asc\fP, which is the ones you want (right click, save link as...).
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.EX
+install\-amd64\-minimal\-20251116T161545Z.iso
+install\-amd64\-minimal\-20251116T161545Z.iso.asc
+.EE
+.UNINDENT
+.UNINDENT
+.IP 4. 3
+Verify iso
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.EX
+gpg \-\-auto\-key\-locate=clear,nodefault,wkd \-\-locate\-key releng@gentoo.org
+gpg \-\-verify install\-amd64\-minimal\-20251116T161545Z.iso.asc
+.EE
+.UNINDENT
+.UNINDENT
+.IP 5. 3
+Insert thumb drive and find its name \- make \fBabsolutely sure\fP you have the correct drive
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.EX
+sudo dmesg | grep \(dq\e(sd[a\-z]\e)\e|scsi [0\-9]\(dq
+.EE
+.UNINDENT
+.UNINDENT
+.IP 6. 3
+Write the iso image
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.EX
+sudo dd if=install\-amd64\-minimal\-20251116T161545Z.iso of=/dev/sdb bs=4096 status=progress
+sudo sync
+.EE
+.UNINDENT
+.UNINDENT
+.IP 7. 3
+Verify data on thumbdrive. Remove and reinsert the thumbdrive first. Get size of file in bytes from \fBls\fP, use that in \fBcmp\fP which should return without any response (if the data on the drive doesn\(aqt match, it will tell you).
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.EX
+ls \-l install\-amd64\-minimal\-20251116T161545Z.iso
+sudo cat /dev/sdb | cmp \-\-bytes 813670400 install\-amd64\-minimal\-20251123T153051Z.iso
+.EE
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.SS Boot the live\-CD
+.INDENT 0.0
+.IP 1. 3
+BIOS setup
+.sp
+Boot the machine and enter the BIOS setup (by pressing Del, F1, F10, Esc, etc. when initial screen displays)
+.INDENT 3.0
+.IP a. 3
+Change the settings for legacy BIOS boot to support UEFI only. We want to use UEFI and doing this will remove all of the legacy boot options from the boot menu selection, which we don\(aqt want to be booting anyway.
+.IP b. 3
+Find the setting for \(dqWindows\(dq vs \(dqOther OS\(dq and choose \(dqWindows\(dq. This will enable additional options for secure boot which you may want later on.
+.UNINDENT
+.IP 2. 3
+Boot the thumb\-drive ***
+.sp
+Use whatever BIOS keystroke is needed (Del, F1, F10, Esc, etc. \- some machines will have a F\-key assigned to get to the boot menu directly, others have override boot options in the \(dqExit...\(dq menu of setup. Choose the option to boot the thumbdrive.
+.IP 3. 3
+Configure networking ***
+.sp
+Configure either wireless or wired. A wired connection is easier and generally faster if it is available.
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.EX
+ip address
+ip route
+cat /etc/resolv.conf
+
+See if you already have an ip address, a default route, and name resolution. If not then...
+.EE
+.UNINDENT
+.UNINDENT
+.INDENT 3.0
+.IP a. 3
+Wireless
+.sp
+Get name of wireless adapter, enable and configure using Wifi ESSID and password, obtain IP address from DHCP.
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.EX
+ip link
+connmanctl enable wifi
+wpa_supplicant \-B \-i wlp0s20f3 \-c <(wpa_passphrase \(dqMy ESSID\(dq my\-wifi\-password)
+dhcpcd wlp0s20f3
+.EE
+.UNINDENT
+.UNINDENT
+.IP b. 3
+Wired
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.EX
+ip link
+dhcpcd enp3s0
+.EE
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.IP 4. 3
+Remote install (optional) ***
+.sp
+This facilitatea being able to do the remainder of install remotely. This is commonly used, so I\(aqm including it in the guide.
+.INDENT 3.0
+.IP a. 3
+Add normal user
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.EX
+useradd \-m \-G users,wheel ken
+passwd ken
+rc\-service sshd start
+.EE
+.UNINDENT
+.UNINDENT
+.IP b. 3
+Connect remotely to the machine being installed.
+.sp
+Note the IP given given to \fBlivecd\fP in the above step, then ssh to the livecd machine from the machine you wish to continue working from.
+.sp
+If you have a local DHCP server / name server that the live CD gets an IP address from (such as Technitium)  then \fBlivecd\fP may be registered as a host on the network. Otherwise you have to use the machine\(aqs IP address.
+.sp
+Each time that the livecd is booted, the ssh service will generate a new key to identify itself, so the StrictHostKeyChecking option is to allow connection in this case.
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.EX
+ssh \-o StrictHostKeyChecking=no ken@livecd
+password: ****
+sudo \-i
+.EE
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.IP 5. 3
+Partition disk and create file systems
+.sp
+A basic partition scheme is shown below.
+.INDENT 3.0
+.IP a. 3
+Use \fBlsblk\fP and/or \fBdmesg | grep \(dq\e(sd[a\-z]\e)\e|scsi [0\-9]\(dq\fP to determine the drive to install to
+.IP b. 3
+Use \fBgdisk\fP to partition the drive
+.IP c. 3
+Use \fBmkfs.fat \-F 32\fP to create boot/efi partition. If the machine already has an EFI partition, then it should be used for the gentoo install \- and no new boot/EFI partition needs to be made. Just be sure to have a backup of that partition (and ideally all other existing partitions that are to be kept). The 1 GB size is sufficient for booting multiple systems, though 200 MB is enough for the Gentoo install.
+.IP d. 3
+Use \fBmkfs.ext4\fP to create root and home partitions. The \fBxfs\fP format is now preferred over using ext4 \- adjust as desired.
+.IP e. 3
+Use \fBmkswap\fP to create swap partition
+.UNINDENT
+.IP 6. 3
+Mount the file systems ***
+.sp
+The partitions for the new machine need to be mounted under \fB/mnt/gentoo\fP in the live\-CD environment
+.INDENT 3.0
+.IP 1. 3
+Use \fBmount\fP to mount all but swap
+.IP 2. 3
+Use \fBswapon\fP to enable the swap partition
+.UNINDENT
+.sp
+Notes:
+.INDENT 3.0
+.IP \(bu 2
+All partition values shown below are for example only.
+.IP \(bu 2
+Partitions should be created in order of partition number (e.g. sdb1, sdb2, sdb3, sdb4). Rows below are in the order that they can be mounted.
+.IP \(bu 2
+The root partition size is typical, but can be reduced if space is not available. Generally \(dqsteal\(dq from \fBhome\fP until there is no extra available, then reduce \fBroot\fP as needed afterward.  The minimimum root size is about 10 GB.
+.IP \(bu 2
+The boot partition (where the kernels are stored and read when booting) is shared by the ESP (EFI system partition) which is what UEFI looks for when booting. The kernel needs to be available outside of the root partition if it is encrypted at some point. UEFI always looks for a \fBEFI\fP directory within the efi partition, and so doesn\(aqt need to be separate from \fI/boot\fP\&.  That is: boot items live in \fB/boot\fP, and efi items live in \fB/boot/EFI\fP\&.
+.UNINDENT
+.sp
+
+.TS
+box center;
+l|l|l|l|l|l|l.
+T{
+Code
+T}	T{
+Label
+T}	T{
+Size
+T}	T{
+filesystem
+T}	T{
+partition
+T}	T{
+mount point
+T}	T{
+partition name
+T}
+_
+T{
+8300
+T}	T{
+root
+T}	T{
+100 GB
+T}	T{
+ext4
+T}	T{
+/dev/sdb3
+T}	T{
+/mnt/gentoo
+T}	T{
+root
+T}
+_
+T{
+EF00
+T}	T{
+efi
+T}	T{
+1 GB
+T}	T{
+fat32
+T}	T{
+/dev/sdb1
+T}	T{
+/mnt/gentoo/boot
+T}	T{
+efi_boot
+T}
+_
+T{
+8300
+T}	T{
+home
+T}	T{
+<remainder>
+T}	T{
+ext4
+T}	T{
+/dev/sdb4
+T}	T{
+/mnt/gentoo/home
+T}	T{
+home
+T}
+_
+T{
+8200
+T}	T{
+swap
+T}	T{
+4 GB
+T}	T{
+swap
+T}	T{
+/dev/sdb2
+T}	T{
+<none>
+T}	T{
+swap
+T}
+.TE
+.IP 7. 3
+Install the Stage3 file
+.INDENT 3.0
+.IP a. 3
+Go to to the nearest mirror using the \fIlinks\fP browser (use down\-arrow to move, right\-arrow to click\-links, \(dqd\(dq to download, and \(dqq\(dq to quit)
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.EX
+cd /mnt/gentoo
+links http://mirrors.rit.edu/gentoo/releases/amd64/autobuilds/current\-stage3\-amd64\-desktop\-openrc/
+.EE
+.UNINDENT
+.UNINDENT
+.IP b. 3
+Download latest stage3 file (amd64 openrc desktop) and its asc file. \fBlinks\fP is already installed (use ...
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.EX
+stage3\-amd64\-desktop\-openrc\-20251116T161545Z.tar.xz
+stage3\-amd64\-desktop\-openrc\-20251116T161545Z.tar.xz.asc
+.EE
+.UNINDENT
+.UNINDENT
+.IP c. 3
+Verify the stage3 file
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.EX
+gpg \-\-auto\-key\-locate=clear,nodefault,wkd \-\-locate\-key releng@gentoo.org
+gpg \-\-verify stage3\-amd64\-openrc\-20251116T161545Z.tar.xz.asc
+.EE
+.UNINDENT
+.UNINDENT
+.IP d. 3
+Install the stage3 file on the filesystem
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.EX
+tar xpvf stage3\-*.tar.xz \-\-xattrs\-include=\(aq*.*\(aq \-\-numeric\-owner
+.EE
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.SS Change\-root
+.INDENT 0.0
+.IP 1. 4
+Copy DNS information to new system
+.INDENT 4.0
+.INDENT 3.5
+.sp
+.EX
+cp \-\-dereference /etc/resolv.conf /mnt/gentoo/etc/
+.EE
+.UNINDENT
+.UNINDENT
+.IP 2. 4
+Change\-root into the new system ***
+.INDENT 4.0
+.INDENT 3.5
+.sp
+.EX
+arch\-chroot /mnt/gentoo
+.EE
+.UNINDENT
+.UNINDENT
+.IP 3. 4
+Create portage database
+.INDENT 4.0
+.INDENT 3.5
+.sp
+.EX
+emerge\-webrsync
+.EE
+.UNINDENT
+.UNINDENT
+.IP 4. 4
+Profile selection \- if not already set correctly, change the profile to \fB/linux/amd64/xx.x/desktop\fP which matches the desktop stage3 file you are using. Use the profile number of the item listed.
+.INDENT 4.0
+.INDENT 3.5
+.sp
+.EX
+eselect profile list | more
+eselect profile set 3
+.EE
+.UNINDENT
+.UNINDENT
+.IP 5. 4
+Initial configuring of portage. See handbook for more details on each.
+.INDENT 4.0
+.IP a. 3
+Edit \fB/etc/portage/make.conf\fP and add/edit these lines...
+.INDENT 4.0
+.INDENT 3.5
+.sp
+.EX
+GENTOO_MIRRORS=\(dqhttps://mirrors.rit.edu/gentoo\(dq
+FEATURES=\(dqgetbinpkg binpkg\-request\-signature\(dq
+ACCEPT_LICENSE=\(dq@FREE @BINARY\-REDISTRIBUTABLE\(dq
+USE=\(dq\-systemd dist\-kernel refind dracut\(dq
+.EE
+.UNINDENT
+.UNINDENT
+.INDENT 4.0
+.IP i. 5
+Adjust the mirror URL to match the mirror you chose earlier
+.IP ii. 5
+Use binary packages whenever possible
+.IP iii. 5
+Accept binary licenses
+.IP iv. 5
+USE flags \- for best results with binary packages, minimize the number of USE flags you set, but some need to be set. USE flags have multiple purposes
+.INDENT 3.0
+.IP \(bu 2
+choose system options \- this will cause certain software to be chosed and installed without explicitly installing it, as well as configuring that software
+.IP \(bu 2
+configure / choose between options, in addition to configuring how software should be built.
+.UNINDENT
+.UNINDENT
+.sp
+Notes/explaination:
+.INDENT 4.0
+.IP \(bu 2
+\fB\-systemd\fP \- \fIsystemd\fP should never be pulled in as a dependancy for another package
+.IP \(bu 2
+\fBdist\-kernel\fP \- needed when using a pre\-built binary kernel (\fIgentoo\-kernel\-bin\fP)
+.IP \(bu 2
+\fBdracut\fP \- needed for \fIinstallkernel\fP which configures the boot items after a kernel is installed.
+.IP \(bu 2
+\fBintrospection gstreamer colord gnome\-online\-accounts keyring\fP is needed for \fIxfce4\-meta\fP and \fIlxdm\fP install to be binary only
+.UNINDENT
+.IP b. 3
+Run \fBgetuto\fP
+.IP c. 3
+Set binhist mirror.
+.INDENT 4.0
+.IP i. 5
+Determine if you machine supports \(dqv3\(dq. Run \fBld.so \-\-help\fP and if it returns saying the x86\-64\-v3 is supported, then use the \fBx86\-64\-v3\fP variant for in the binpackages URL below, otherwise use \fBx86\-64\fP\&.
+.IP ii. 5
+Use \fBlinks\fP to verify URL for binary packages that match the \fBdesktop\fP profile.
+.IP iii. 5
+Edit \fB/etc/portage/binrepos.conf/gentobinhost.conf\fP accordingly...
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.EX
+sync\-uri = https://mirrors.rit.edu/gentoo/releases/amd64/binpackages/23.0/x86\-64
+.EE
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.IP d. 3
+Set rsync mirror \- this is used to update the portage tree (which was initially done by emerge\-webrsync). Create/edit \fB/etc/portage/repos.conf\fP accordingly...
+.INDENT 4.0
+.INDENT 3.5
+.sp
+.EX
+[gentoo]
+sync\-uri = rsync://rsync5.us.gentoo.org/gentoo\-portage
+.EE
+.UNINDENT
+.UNINDENT
+.IP e. 3
+Update ebuild repository and portage app
+.INDENT 4.0
+.INDENT 3.5
+.sp
+.EX
+emerge \-\-sync
+emerge \-\-ask \-\-verbose \-\-oneshot sys\-apps/portage
+.EE
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.IP 6. 4
+Set time\-zone
+.INDENT 4.0
+.INDENT 3.5
+.sp
+.EX
+cd /etc
+ln \-sf ../usr/share/zoneinfo/America/New_York localtime
+.EE
+.UNINDENT
+.UNINDENT
+.IP 7. 4
+Locale
+.INDENT 4.0
+.IP a. 3
+Generation \- edit file so it has (only) \fBen_US.UTF\-8 UTF\-8\fP uncommented.
+.INDENT 4.0
+.INDENT 3.5
+.sp
+.EX
+nano locale.gen
+locale\-gen
+.EE
+.UNINDENT
+.UNINDENT
+.IP b. 3
+Selection \- use \fBeselect\fP to select the \fBen_US.UTF\-8\fP profile
+.INDENT 4.0
+.INDENT 3.5
+.sp
+.EX
+eselect locale list
+eselect locale set 5
+\&. ./profile
+.EE
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.IP 8. 4
+Update fstab
+.sp
+Run \fBblkid >> /etc/fstab\fP to add the information needed, then edit that information down to the below format using \fBnano /etc/fstab\fP\&.
+.INDENT 4.0
+.INDENT 3.5
+.sp
+.EX
+UUID=402E\-DDEB                             /efi            vfat            umask=0077,tz=UTC        1 2
+UUID=1651c6f4\-c3fa\-441a\-b0d4\-6509baf19cdd  /               ext4            defaults,noatime         0 1
+UUID=71222dab\-818a\-4b34\-9d07\-3a5cd3a6f9a4  none            swap            sw                       0 0
+.EE
+.UNINDENT
+.UNINDENT
+.IP 9. 4
+Set the hostname
+.INDENT 4.0
+.INDENT 3.5
+.sp
+.EX
+echo claude > /etc/hostname
+.EE
+.UNINDENT
+.UNINDENT
+.IP 10. 4
+Install and setup DHCP for network
+.INDENT 4.0
+.INDENT 3.5
+.sp
+.EX
+emerge \-\-ask \-\-verbose net\-misc/dhcpcd
+rc\-update add dhcpcd default
+rc\-service dhcpcd start             # ***
+.EE
+.UNINDENT
+.UNINDENT
+.IP 11. 4
+Edit \fB/etc/hosts\fP
+.INDENT 4.0
+.INDENT 3.5
+.sp
+.EX
+127.0.0.1       claude.birchtreefarm.internal claude localhost
+::1             claude.birchtreefarm.internal claude localhost
+.EE
+.UNINDENT
+.UNINDENT
+.IP 12. 4
+User setup
+.INDENT 4.0
+.IP a. 3
+Set root password
+.INDENT 4.0
+.INDENT 3.5
+.sp
+.EX
+passwd
+.EE
+.UNINDENT
+.UNINDENT
+.IP b. 3
+Create a regular user
+.INDENT 4.0
+.INDENT 3.5
+.sp
+.EX
+useradd \-G users,wheel ken
+.EE
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.IP 13. 4
+System services
+.sp
+Setup a logger, cron, and ssh, bash completion, time sync
+.sp
+Note: the emerge line is all one line
+.INDENT 4.0
+.INDENT 3.5
+.sp
+.EX
+emerge \-\-ask \-\-verbose app\-admin/sysklogd sys\-process/cronie app\-shells/bash\-completion \e
+   net\-misc/chrony sys\-fs/e2fsprogs sys\-fs/dosfstools
+rc\-update add sysklogd default
+rc\-update add cronie default
+rc\-update add sshd default
+rc\-update add chronyd default
+rc\-update add elogind default
+rc\-update add dbus default
+.EE
+.UNINDENT
+.UNINDENT
+.IP 14. 4
+Kernel
+.INDENT 4.0
+.IP 1. 3
+Install kernel (binary)
+.INDENT 4.0
+.INDENT 3.5
+.sp
+.EX
+emerge \-\-ask \-\-verbose sys\-kernel/installkernel
+mkdir \-p /efi/EFI/Gentoo
+
+emerge \-\-ask \-\-verbose linux\-firmware sof\-firmware
+emerge \-\-ask \-\-verbose intel\-microcode                     # only needed for Intel CPUs
+
+emerge \-\-ask \-\-verbose \-\-config sys\-kernel/gentoo\-kernel\-bin
+eselect kernel list
+eselect kernel set 1
+eselect kernel list
+.EE
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.IP 15. 4
+Bootloader
+.sp
+Install and configure the boot loader. As before, use \fBblkid\fP to view current partitions and their IDs. This UUID should be the UUID of the root (/) partition. \fIrEFInd\fP takes care of adding information for the initrd.
+.INDENT 4.0
+.INDENT 3.5
+.sp
+.EX
+emerge \-\-ask \-\-verbose sys\-boot/refind
+blkid >> /boot/refind_linux.conf
+nano /boot/refind_linux.conf
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+Content
+.INDENT 4.0
+.INDENT 3.5
+.sp
+.EX
+\(dqGentoo\(dq \(dqroot=UUID=1651c6f4\-c3fa\-441a\-b0d4\-6509baf19cdd\(dq
+.EE
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.SH New Environment
+.INDENT 0.0
+.IP 1. 3
+Restart
+.INDENT 3.0
+.IP a. 3
+Restart the machine (without booting the install disk) and make sure you boot into your new system.
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.EX
+/sbin/shutdown \-r now
+.EE
+.UNINDENT
+.UNINDENT
+.IP b. 3
+Take care of any issues you see while it boots.
+.UNINDENT
+.IP 2. 3
+Desktop environment
+.INDENT 3.0
+.IP a. 3
+Install the meta package for \fIxfce4\fP and \fIlxdm\fP
+.sp
+References
+.INDENT 3.0
+.IP i. 5
+\%<https://\:wiki\:.gentoo\:.org/\:wiki/\:Xfce>
+.IP ii. 5
+\%<https://\:www\:.linuxfromscratch\:.org/\:blfs/\:view/\:11\:.3/\:x/\:lxdm\:.html>
+.UNINDENT
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.EX
+emerge \-\-ask \-\-verbose xfce4\-meta lxdm
+.EE
+.UNINDENT
+.UNINDENT
+.IP b. 3
+Edit /etc/lxdm/lxdm.conf and uncomment the \fIsession\fP line and change it to point to \fI/usr/bin/startxfce4\fP\&.
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.EX
+nano /etc/lxdm/lxdm.conf
+.EE
+.UNINDENT
+.UNINDENT
+.IP c. 3
+Add \fIxdm\fP to the default runlevel
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.EX
+rc\-update add xdm default
+.EE
+.UNINDENT
+.UNINDENT
+.IP d. 3
+Configure \fIxdm\fP to use \fIlxdm\fP\&.  Edit \fI/etc/conf.d/display\-manager\fP and change the \fIDISPLAYMANAGER\fP setting to \fIlxdm\fP\&.
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.EX
+nano /etc/conf.d/display\-manager
+.EE
+.UNINDENT
+.UNINDENT
+.IP e. 3
+Restart \- I find it easier to simply restart at this point. It verifies you can boot and end up logged into \fIxfce4\fP\&. Log in and open a terminal window.
+.sp
+At this point the disk useage should be approximately 8.1 G for \fIroot\fP and under 100 M for \fIEFI\fP/\fIboot\fP\&.
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.EX
+df \-h
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+Checking memory use should show that swap space is available
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.EX
+free
+.EE
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.SH Notes
+.INDENT 0.0
+.IP 1. 3
+Portage notes for installing/updating/removing software (not needed now)
+.INDENT 3.0
+.IP a. 3
+Update all packages
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.EX
+emerge \-\-ask \-\-verbose \-\-update \-\-deep @world
+emerge \-\-ask \-\-depclean
+.EE
+.UNINDENT
+.UNINDENT
+.IP b. 3
+List all manually installed packages
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.EX
+cat /var/lib/portage/world
+.EE
+.UNINDENT
+.UNINDENT
+.IP c. 3
+Remove a package
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.EX
+emerge \-\-ask \-\-verbose \-\-depclean package\-to\-remove
+emerge \-\-ask \-\-verbose \-\-depclean
+.EE
+.UNINDENT
+.UNINDENT
+.IP d. 3
+verify currently installed packages if you have modified configurations or USE flags
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.EX
+emerge \-\-ask \-\-verbose \-\-changed\-use @world
+.EE
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.IP 2. 3
+System services notes for managing services running in the background
+.INDENT 3.0
+.IP a. 3
+list all services in \fIdefault\fP run\-level
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.EX
+rc\-status default
+.EE
+.UNINDENT
+.UNINDENT
+.IP b. 3
+list all services
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.EX
+ls /etc/init.d
+.EE
+.UNINDENT
+.UNINDENT
+.IP c. 3
+add service to run in the background
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.EX
+rc\-update add myservice default
+.EE
+.UNINDENT
+.UNINDENT
+.IP d. 3
+start a system service (now, as apposed to when the system restarts)
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.EX
+rc\-service myservice start
+.EE
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.IP 3. 3
+Misc.
+.INDENT 3.0
+.IP 1. 3
+install tlp if on a laptop
+.IP 2. 3
+logs are in /var/log/messages
+.IP 3. 3
+The Void Linux documentation is recomended. Void linux is a non\-systemd distribution. \%<https://\:docs\:.voidlinux\:.org/>
+.IP 4. 3
+When in a text terminal, you can switch between the available text terminals using \fIAlt F1\fP \- \fIAlt F6\fP\&. If you boot into \fIxfce4\fP, you can switch to a text terminal using \fIAlt F1\fP \- \fIAlt F6\fP and then back to the graphical environment using \fICtrl Alt F7\fP\&.
+.UNINDENT
+.UNINDENT
+.\" End of generated man page.

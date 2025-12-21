@@ -256,18 +256,17 @@ Boot the live-CD
 
 #. Install the Stage3 file
 
-   a. Go to to the nearest mirror
-
-      ::
-
-       http://mirrors.rit.edu/gentoo/releases/amd64/autobuilds/current-stage3-amd64-desktop-openrc/
-
-   #. Download latest stage3 file (amd64 openrc desktop) and its asc file. ``links`` is already installed (use down-arrow to move, right-arrow to click-links, "d" to download, and "q" to quit...
+   a. Go to to the nearest mirror using the `links` browser (use down-arrow to move, right-arrow to click-links, "d" to download, and "q" to quit)
 
       ::
 
        cd /mnt/gentoo
-       chronyd -q
+       links http://mirrors.rit.edu/gentoo/releases/amd64/autobuilds/current-stage3-amd64-desktop-openrc/
+
+   #. Download latest stage3 file (amd64 openrc desktop) and its asc file. ``links`` is already installed (use ...
+
+      ::
+
        stage3-amd64-desktop-openrc-20251116T161545Z.tar.xz
        stage3-amd64-desktop-openrc-20251116T161545Z.tar.xz.asc
 

@@ -459,6 +459,16 @@ T}
 Install the Stage3 file
 .INDENT 3.0
 .IP a. 3
+Make sure system date/time is set
+.INDENT 3.0
+.INDENT 3.5
+.sp
+.EX
+chronyd \-q
+.EE
+.UNINDENT
+.UNINDENT
+.IP b. 3
 Go to to the nearest mirror using the \fIlinks\fP browser (use down\-arrow to move, right\-arrow to click\-links, \(dqd\(dq to download, and \(dqq\(dq to quit)
 .INDENT 3.0
 .INDENT 3.5
@@ -469,7 +479,7 @@ links http://mirrors.rit.edu/gentoo/releases/amd64/autobuilds/current\-stage3\-a
 .EE
 .UNINDENT
 .UNINDENT
-.IP b. 3
+.IP c. 3
 Download latest stage3 file (amd64 openrc desktop) and its asc file. \fBlinks\fP is already installed (use ...
 .INDENT 3.0
 .INDENT 3.5
@@ -480,7 +490,7 @@ stage3\-amd64\-desktop\-openrc\-20251116T161545Z.tar.xz.asc
 .EE
 .UNINDENT
 .UNINDENT
-.IP c. 3
+.IP d. 3
 Verify the stage3 file
 .INDENT 3.0
 .INDENT 3.5
@@ -491,7 +501,7 @@ gpg \-\-verify stage3\-amd64\-openrc\-20251116T161545Z.tar.xz.asc
 .EE
 .UNINDENT
 .UNINDENT
-.IP d. 3
+.IP e. 3
 Install the stage3 file on the filesystem
 .INDENT 3.0
 .INDENT 3.5
@@ -536,13 +546,14 @@ emerge\-webrsync
 .UNINDENT
 .UNINDENT
 .IP 4. 4
-Profile selection \- if not already set correctly, change the profile to \fB/linux/amd64/xx.x/desktop\fP which matches the desktop stage3 file you are using. Use the profile number of the item listed.
+Profile selection \- if not already set correctly, change the profile to \fB/linux/amd64/xx.x/desktop (stable)\fP which matches the desktop stage3 file you are using. Use the profile number of the item listed. Be sure to \fBnot\fP use the profile with \(dqsystemd\(dq in the name, only \(dqdesktop\(dq. The selected item will have an \fB*\fP\&.
 .INDENT 4.0
 .INDENT 3.5
 .sp
 .EX
 eselect profile list | more
 eselect profile set 3
+eselect profile list | more
 .EE
 .UNINDENT
 .UNINDENT
@@ -550,7 +561,18 @@ eselect profile set 3
 Initial configuring of portage. See handbook for more details on each.
 .INDENT 4.0
 .IP a. 3
-Edit \fB/etc/portage/make.conf\fP and add/edit these lines...
+Edit \fB/etc/portage/make.conf\fP
+.INDENT 4.0
+.INDENT 3.5
+.sp
+.EX
+cd /etc/portage
+nano make.conf
+.EE
+.UNINDENT
+.UNINDENT
+.IP b. 3
+add/edit these lines...
 .INDENT 4.0
 .INDENT 3.5
 .sp
@@ -558,7 +580,8 @@ Edit \fB/etc/portage/make.conf\fP and add/edit these lines...
 GENTOO_MIRRORS=\(dqhttps://mirrors.rit.edu/gentoo\(dq
 FEATURES=\(dqgetbinpkg binpkg\-request\-signature\(dq
 ACCEPT_LICENSE=\(dq@FREE @BINARY\-REDISTRIBUTABLE\(dq
-USE=\(dq\-systemd dist\-kernel refind dracut\(dq
+USE=\(dq\-systemd dist\-kernel dracut introspection gstreamer colord gnome\-online\-accounts keyring\(dq
+PYTHON_TARGETS=\(dqpython3_12\(dq
 .EE
 .UNINDENT
 .UNINDENT
@@ -590,9 +613,13 @@ Notes/explaination:
 .IP \(bu 2
 \fBintrospection gstreamer colord gnome\-online\-accounts keyring\fP is needed for \fIxfce4\-meta\fP and \fIlxdm\fP install to be binary only
 .UNINDENT
-.IP b. 3
-Run \fBgetuto\fP
+.INDENT 4.0
+.IP 1. 3
+Python targets \- \fIportage\fP the app that controls all the installation of packages in Gentoo is written in Python. This version should match the current version in the binary packages. If it doesn\(aqt, you get a warning about source vs. binary packages when updating \fIportage\fP\&.
+.UNINDENT
 .IP c. 3
+Run \fBgetuto\fP
+.IP d. 3
 Set binhist mirror.
 .INDENT 4.0
 .IP i. 5
@@ -610,7 +637,7 @@ sync\-uri = https://mirrors.rit.edu/gentoo/releases/amd64/binpackages/23.0/x86\-
 .UNINDENT
 .UNINDENT
 .UNINDENT
-.IP d. 3
+.IP e. 3
 Set rsync mirror \- this is used to update the portage tree (which was initially done by emerge\-webrsync). Create/edit \fB/etc/portage/repos.conf\fP accordingly...
 .INDENT 4.0
 .INDENT 3.5
@@ -621,14 +648,14 @@ sync\-uri = rsync://rsync5.us.gentoo.org/gentoo\-portage
 .EE
 .UNINDENT
 .UNINDENT
-.IP e. 3
+.IP f. 3
 Update ebuild repository and portage app
 .INDENT 4.0
 .INDENT 3.5
 .sp
 .EX
 emerge \-\-sync
-emerge \-\-ask \-\-verbose \-\-oneshot sys\-apps/portage
+emerge \-\-ask \-\-verbose \-\-oneshot \-\-changed\-use sys\-apps/portage
 .EE
 .UNINDENT
 .UNINDENT

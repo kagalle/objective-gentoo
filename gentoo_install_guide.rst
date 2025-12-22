@@ -256,7 +256,13 @@ Boot the live-CD
 
 #. Install the Stage3 file
 
-   a. Go to to the nearest mirror using the `links` browser (use down-arrow to move, right-arrow to click-links, "d" to download, and "q" to quit)
+   a. Make sure system date/time is set
+
+      ::
+
+       chronyd -q
+
+   #. Go to to the nearest mirror using the `links` browser (use down-arrow to move, right-arrow to click-links, "d" to download, and "q" to quit)
 
       ::
 
@@ -306,23 +312,31 @@ Change-root
 
     emerge-webrsync
 
-#. Profile selection - if not already set correctly, change the profile to ``/linux/amd64/xx.x/desktop`` which matches the desktop stage3 file you are using. Use the profile number of the item listed.
+#. Profile selection - if not already set correctly, change the profile to ``/linux/amd64/xx.x/desktop (stable)`` which matches the desktop stage3 file you are using. Use the profile number of the item listed. Be sure to **not** use the profile with "systemd" in the name, only "desktop". The selected item will have an ``*``.
    ::
-
 
     eselect profile list | more
     eselect profile set 3
+    eselect profile list | more
 
 #. Initial configuring of portage. See handbook for more details on each.
 
-   a. Edit ``/etc/portage/make.conf`` and add/edit these lines...
+   a. Edit ``/etc/portage/make.conf``
+
+      ::
+
+       cd /etc/portage
+       nano make.conf
+
+   #. add/edit these lines...
 
       ::
 
        GENTOO_MIRRORS="https://mirrors.rit.edu/gentoo"
        FEATURES="getbinpkg binpkg-request-signature"
        ACCEPT_LICENSE="@FREE @BINARY-REDISTRIBUTABLE"
-       USE="-systemd dist-kernel refind dracut"
+       USE="-systemd dist-kernel dracut introspection gstreamer colord gnome-online-accounts keyring"
+       PYTHON_TARGETS="python3_12"
 
       i. Adjust the mirror URL to match the mirror you chose earlier
       #. Use binary packages whenever possible
@@ -338,6 +352,8 @@ Change-root
       - ``dist-kernel`` - needed when using a pre-built binary kernel (`gentoo-kernel-bin`)
       - ``dracut`` - needed for `installkernel` which configures the boot items after a kernel is installed.
       - ``introspection gstreamer colord gnome-online-accounts keyring`` is needed for `xfce4-meta` and `lxdm` install to be binary only
+
+      #. Python targets - `portage` the app that controls all the installation of packages in Gentoo is written in Python. This version should match the current version in the binary packages. If it doesn't, you get a warning about source vs. binary packages when updating `portage`.
 
 
    #. Run ``getuto``
@@ -363,7 +379,7 @@ Change-root
       ::
 
        emerge --sync
-       emerge --ask --verbose --oneshot sys-apps/portage
+       emerge --ask --verbose --oneshot --changed-use sys-apps/portage
 
 #. Set time-zone
 

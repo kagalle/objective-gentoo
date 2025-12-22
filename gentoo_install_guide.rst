@@ -247,7 +247,7 @@ Boot the live-CD
    +====+=====+=============+============+=================+=================+=================+
    |8300|root |100 GB       |ext4        |/dev/sdb3        |/mnt/gentoo      |root             |
    +----+-----+-------------+------------+-----------------+-----------------+-----------------+
-   |EF00|efi  |1 GB         |fat32       |/dev/sdb1        |/mnt/gentoo/boot |efi_boot         |
+   |EF00|boot |1 GB         |fat32       |/dev/sdb1        |/mnt/gentoo/boot |efi_boot         |
    +----+-----+-------------+------------+-----------------+-----------------+-----------------+
    |8300|home |<remainder>  |ext4        |/dev/sdb4        |/mnt/gentoo/home |home             |
    +----+-----+-------------+------------+-----------------+-----------------+-----------------+
@@ -411,7 +411,7 @@ Change-root
 
    ::
 
-    UUID=402E-DDEB                             /efi            vfat            umask=0077,tz=UTC        1 2
+    UUID=402E-DDEB                             /boot           vfat            umask=0077,tz=UTC        1 2
     UUID=1651c6f4-c3fa-441a-b0d4-6509baf19cdd  /               ext4            defaults,noatime         0 1
     UUID=71222dab-818a-4b34-9d07-3a5cd3a6f9a4  none            swap            sw                       0 0
 
@@ -427,7 +427,6 @@ Change-root
 
     emerge --ask --verbose net-misc/dhcpcd
     rc-update add dhcpcd default
-    rc-service dhcpcd start             # ***
 
 #. Edit ``/etc/hosts``
 
@@ -449,6 +448,7 @@ Change-root
       ::
 
        useradd -G users,wheel ken
+       passwd ken
 
 #. System services
 
@@ -459,13 +459,21 @@ Change-root
    ::
 
     emerge --ask --verbose app-admin/sysklogd sys-process/cronie app-shells/bash-completion \
-       net-misc/chrony sys-fs/e2fsprogs sys-fs/dosfstools
+       net-misc/chrony sys-fs/e2fsprogs sys-fs/dosfstools app-admin/sudo
     rc-update add sysklogd default
     rc-update add cronie default
     rc-update add sshd default
     rc-update add chronyd default
     rc-update add elogind default
     rc-update add dbus default
+
+   Setup `sudo`
+
+   ::
+
+    EDITOR=nano visudo
+
+   Towards the bottom of the file, find ``# %wheel ALL=(ALL:ALL) NOPASSWD: ALL`` and remove the leading ``#`` to uncomment the line, save.
 
 #. Kernel
 
@@ -474,10 +482,13 @@ Change-root
       ::
 
        emerge --ask --verbose sys-kernel/installkernel
-       mkdir -p /efi/EFI/Gentoo
+       mkdir -p /boot/EFI/Gentoo
 
-       emerge --ask --verbose linux-firmware sof-firmware
-       emerge --ask --verbose intel-microcode                     # only needed for Intel CPUs
+       # these can all be on one typed line and should be emerged as a group
+       # intel-microcode is only needed for Intel CPUs
+       emerge --ask --verbose linux-firmware sof-firmware     \
+                              intel-microcode                 \
+                              sys-kernel/gentoo-kernel-bin
 
        emerge --ask --verbose --config sys-kernel/gentoo-kernel-bin
        eselect kernel list
@@ -491,7 +502,7 @@ Change-root
 
    ::
 
-    emerge --ask --verbose sys-boot/refind
+    emerge --ask --verbose sys-boot/refind efibootmgr
     blkid >> /boot/refind_linux.conf
     nano /boot/refind_linux.conf
 
@@ -500,6 +511,12 @@ Change-root
    ::
 
     "Gentoo" "root=UUID=1651c6f4-c3fa-441a-b0d4-6509baf19cdd"
+
+   Then install refind to UEFI
+
+   ::
+
+    refind-install
 
 ---------------
 New Environment
@@ -511,6 +528,11 @@ New Environment
 
       ::
 
+       exit
+       umount home
+       umount boot
+       cd ..
+       umount gentoo
        /sbin/shutdown -r now
 
    #. Take care of any issues you see while it boots.

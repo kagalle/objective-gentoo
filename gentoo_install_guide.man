@@ -410,7 +410,7 @@ _
 T{
 EF00
 T}	T{
-efi
+boot
 T}	T{
 1 GB
 T}	T{
@@ -706,7 +706,7 @@ Run \fBblkid >> /etc/fstab\fP to add the information needed, then edit that info
 .INDENT 3.5
 .sp
 .EX
-UUID=402E\-DDEB                             /efi            vfat            umask=0077,tz=UTC        1 2
+UUID=402E\-DDEB                             /boot           vfat            umask=0077,tz=UTC        1 2
 UUID=1651c6f4\-c3fa\-441a\-b0d4\-6509baf19cdd  /               ext4            defaults,noatime         0 1
 UUID=71222dab\-818a\-4b34\-9d07\-3a5cd3a6f9a4  none            swap            sw                       0 0
 .EE
@@ -730,7 +730,6 @@ Install and setup DHCP for network
 .EX
 emerge \-\-ask \-\-verbose net\-misc/dhcpcd
 rc\-update add dhcpcd default
-rc\-service dhcpcd start             # ***
 .EE
 .UNINDENT
 .UNINDENT
@@ -765,6 +764,7 @@ Create a regular user
 .sp
 .EX
 useradd \-G users,wheel ken
+passwd ken
 .EE
 .UNINDENT
 .UNINDENT
@@ -780,7 +780,7 @@ Note: the emerge line is all one line
 .sp
 .EX
 emerge \-\-ask \-\-verbose app\-admin/sysklogd sys\-process/cronie app\-shells/bash\-completion \e
-   net\-misc/chrony sys\-fs/e2fsprogs sys\-fs/dosfstools
+   net\-misc/chrony sys\-fs/e2fsprogs sys\-fs/dosfstools app\-admin/sudo
 rc\-update add sysklogd default
 rc\-update add cronie default
 rc\-update add sshd default
@@ -790,6 +790,18 @@ rc\-update add dbus default
 .EE
 .UNINDENT
 .UNINDENT
+.sp
+Setup \fIsudo\fP
+.INDENT 4.0
+.INDENT 3.5
+.sp
+.EX
+EDITOR=nano visudo
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+Towards the bottom of the file, find \fB# %wheel ALL=(ALL:ALL) NOPASSWD: ALL\fP and remove the leading \fB#\fP to uncomment the line, save.
 .IP 14. 4
 Kernel
 .INDENT 4.0
@@ -800,10 +812,13 @@ Install kernel (binary)
 .sp
 .EX
 emerge \-\-ask \-\-verbose sys\-kernel/installkernel
-mkdir \-p /efi/EFI/Gentoo
+mkdir \-p /boot/EFI/Gentoo
 
-emerge \-\-ask \-\-verbose linux\-firmware sof\-firmware
-emerge \-\-ask \-\-verbose intel\-microcode                     # only needed for Intel CPUs
+# these can all be on one typed line and should be emerged as a group
+# intel\-microcode is only needed for Intel CPUs
+emerge \-\-ask \-\-verbose linux\-firmware sof\-firmware     \e
+                       intel\-microcode                 \e
+                       sys\-kernel/gentoo\-kernel\-bin
 
 emerge \-\-ask \-\-verbose \-\-config sys\-kernel/gentoo\-kernel\-bin
 eselect kernel list
@@ -821,7 +836,7 @@ Install and configure the boot loader. As before, use \fBblkid\fP to view curren
 .INDENT 3.5
 .sp
 .EX
-emerge \-\-ask \-\-verbose sys\-boot/refind
+emerge \-\-ask \-\-verbose sys\-boot/refind efibootmgr
 blkid >> /boot/refind_linux.conf
 nano /boot/refind_linux.conf
 .EE
@@ -837,6 +852,16 @@ Content
 .EE
 .UNINDENT
 .UNINDENT
+.sp
+Then install refind to UEFI
+.INDENT 4.0
+.INDENT 3.5
+.sp
+.EX
+refind\-install
+.EE
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .SH New Environment
 .INDENT 0.0
@@ -849,6 +874,11 @@ Restart the machine (without booting the install disk) and make sure you boot in
 .INDENT 3.5
 .sp
 .EX
+exit
+umount home
+umount boot
+cd ..
+umount gentoo
 /sbin/shutdown \-r now
 .EE
 .UNINDENT

@@ -336,7 +336,6 @@ Change-root
        FEATURES="getbinpkg binpkg-request-signature"
        ACCEPT_LICENSE="@FREE @BINARY-REDISTRIBUTABLE"
        USE="-systemd dist-kernel dracut introspection gstreamer colord gnome-online-accounts keyring"
-       PYTHON_TARGETS="python3_12"
 
       i. Adjust the mirror URL to match the mirror you chose earlier
       #. Use binary packages whenever possible
@@ -352,9 +351,6 @@ Change-root
       - ``dist-kernel`` - needed when using a pre-built binary kernel (`gentoo-kernel-bin`)
       - ``dracut`` - needed for `installkernel` which configures the boot items after a kernel is installed.
       - ``introspection gstreamer colord gnome-online-accounts keyring`` is needed for `xfce4-meta` and `lxdm` install to be binary only
-
-      #. Python targets - `portage` the app that controls all the installation of packages in Gentoo is written in Python. This version should match the current version in the binary packages. If it doesn't, you get a warning about source vs. binary packages when updating `portage`.
-
 
    #. Run ``getuto``
    #. Set binhist mirror.

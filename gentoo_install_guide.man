@@ -90,9 +90,9 @@ This guide is meant to be used along with the official Gentoo handbook \%<https:
 .sp
 As the handbook is very detailed, it is easy to \(dqmiss the forest in the trees.\(dq This guide is meant to limit installation choices and hide some of the complexity and verbosity of the handbook to ease the process, so that important details are not overlooked.
 .sp
-Using the gentoo install media to install the system, but note that a current SystemResuceCD (on a flash\-drive) can be very helpful, and can also be used to download and create the gentoo install media as described below.
+Using the Gentoo install media to install the system, but note that a current SystemResuceCD (on a flash\-drive) can be very helpful, and can also be used to download and create the Gentoo install media as described below.
 .sp
-The details of partitioning the drive using gdisk are left out of this guide.
+The details of partitioning the drive using \fIgdisk\fP are left out of this guide.
 .sp
 Commands shown are \fBexamples\fP and should be edited if needed.
 .INDENT 0.0
@@ -105,7 +105,7 @@ Commands shown are \fBexamples\fP and should be edited if needed.
 .UNINDENT
 .sp
 The steps do not need to be done in one session, start to finish. However if you are anywhere between Boot the live\-CD and \fIBootloader\fP you will need to redo all steps marked with \fB***\fP up to the point where you left off.
-.SH Contraints
+.SH Constraints
 .INDENT 0.0
 .IP \(bu 2
 x86\-64 (AMD64 or Intel 64)
@@ -122,7 +122,7 @@ I attempted to create this guide using EFI stub booting, ie booting directly fro
 .IP \(bu 2
 Install media
 .sp
-Create the Gentoo\-minimal\-install thumbdrive using an existing linux desktop with a browser available. Other bootable media can be used, but Gentoo\(aqs media makes the process more straight forward. It is worth using this method. Also, see the note above about using SystemResuceCD as the existing linux desktop.
+Create the Gentoo\-minimal\-install thumb\-drive using an existing Linux desktop with a browser available. Other bootable media can be used, but Gentoo\(aqs media makes the process more straight forward. It is worth using this method. Also, see the note above about using SystemResuceCD as the existing Linux desktop.
 .IP \(bu 2
 Downloads from my nearest mirror site
 .sp
@@ -134,13 +134,13 @@ Create partitions with \fB/\fP (root), \fB/boot\fP (including efi), swap (and op
 .sp
 GPT goes with UEFI. GPT is not supported with BIOS. MBR partitioning was used for BIOS (and optionally with compatibility mode) instead. GPT works well and has fewer restrictions and more features.
 .IP \(bu 2
-OpenRC (as apposed to using \fIsystemd\fP for init)
+OpenRC (as apposed to using \fIsystemd\fP for the \fIinit\fP system)
 .sp
 This a \(dqsensitive\(dq topic \- just check the Internet for articles over the last 10 years or more. My success with \fIsystemd\fP has been less positive than without it, and so I choose to avoid it. This is based strictly my personal opinion. Systemd is a set of software that has enveloped much of the Linux system software. Note that the \fIinit\fP process is only one area affected by \fIsystemd\fP\&. Other areas, especially related to the desktop environment (e.g. elogind) are also \fIsystemd\fP related, but usable outside of that environment. There are other examples like audio support \fIpulseaudio\fP\&. When I started with Linux, \fIsystemd\fP didn\(aqt exist.
 .IP \(bu 2
 Desktop profile and matching Stage3 file
 .sp
-Choice of a profile makes a big difference on how large the final system is and how much software is installed by default. However, for a desktop machine, it is best to use the desktop profile, as all that additional software makes for a lot less manual configuration and a much smoother experience. It is well worth if you want to use a desktop enviroment, like in this case, \fIxfce4\fP\&.
+Choice of a profile makes a big difference on how large the final system is and how much software is installed by default. However, for a desktop machine, it is best to use the desktop profile, as all that additional software makes for a lot less manual configuration and a much smoother experience. It is well worth if you want to use a desktop environment, like in this case, \fIxfce4\fP\&.
 .IP \(bu 2
 Use the pre\-built Gentoo binary kernel
 .sp
@@ -167,10 +167,10 @@ These are pieces of system software that run in the background. You can choose b
 .sp
 .SS Create bootable media
 .sp
-Using an existing linux installation (or a machine that is started using SystemRescueCD or similar), create a removable thumb\-drive that can boot the destination machine. This live\-CD environment will contain the scripts and utilities needed to prepare the destination machine to boot Gentoo directly. Existing machines with other operating systems can be used to create this live\-CD, but the steps would be somewhat different. The name \(dqlive\-CD\(dq matches the assigned host\-name when the system is running \- it can be any sort of removable media, like a CD\-ROM or a flash\-drive.
+Using an existing Linux installation (or a machine that is started using SystemRescueCD or similar), create a removable thumb\-drive that can boot the destination machine. This live\-CD environment will contain the scripts and utilities needed to prepare the destination machine to boot Gentoo directly. Existing machines with other operating systems can be used to create this live\-CD, but the steps would be somewhat different. The name \(dqlive\-CD\(dq matches the assigned host\-name when the system is running \- it can be any sort of removable media, like a CD\-ROM or a flash\-drive.
 .INDENT 0.0
 .IP 1. 3
-Manually find your nearest mirror \- go to \fBhttps://www.gentoo.org/downloads/mirrors/\fP and make note of the https URL of the mirror you choose.
+Manually find your nearest mirror \- go to \fBhttps://www.gentoo.org/downloads/mirrors/\fP and make note of the \%<https://> URL of the mirror you choose.
 .IP 2. 3
 In a browser, go to the nearest mirror
 .INDENT 3.0
@@ -182,7 +182,7 @@ http://mirrors.rit.edu/gentoo/releases/amd64/autobuilds/current\-install\-amd64\
 .UNINDENT
 .UNINDENT
 .IP 3. 3
-Download latest iso and its asc file. There will several older \fB\&.asc\fP files along with the current \fB\&.iso\fP and \fB\&.iso.asc\fP, which is the ones you want (right click, save link as...).
+Download latest \fI\&.iso\fP and its \fI\&.asc\fP file. There will be several older \fI\&.asc\fP files along with the current \fI\&.iso\fP and \fI\&.iso.asc\fP, which are the ones you want (right click, save link as...).
 .INDENT 3.0
 .INDENT 3.5
 .sp
@@ -193,7 +193,7 @@ install\-amd64\-minimal\-20251116T161545Z.iso.asc
 .UNINDENT
 .UNINDENT
 .IP 4. 3
-Verify iso
+Verify the \fI\&.iso\fP file
 .INDENT 3.0
 .INDENT 3.5
 .sp
@@ -225,7 +225,7 @@ sudo sync
 .UNINDENT
 .UNINDENT
 .IP 7. 3
-Verify data on thumbdrive. Remove and reinsert the thumbdrive first. Get size of file in bytes from \fBls\fP, use that in \fBcmp\fP which should return without any response (if the data on the drive doesn\(aqt match, it will tell you).
+Verify data on thumb\-drive. Remove and reinsert the thumb\-drive first. Get size of file in bytes from \fBls\fP, use that in \fBcmp\fP which should return without any response (if the data on the drive doesn\(aqt match, it will tell you).
 .INDENT 3.0
 .INDENT 3.5
 .sp
@@ -246,7 +246,7 @@ Boot the machine and enter the BIOS setup (by pressing Del, F1, F10, Esc, etc. w
 .IP a. 3
 Change the settings for legacy BIOS boot to support UEFI only. We want to use UEFI and doing this will remove all of the legacy boot options from the boot menu selection, which we don\(aqt want to be booting anyway.
 .IP b. 3
-Find the setting for \(dqWindows\(dq vs \(dqOther OS\(dq and choose \(dqWindows\(dq. This will enable additional options for secure boot which you may want later on.
+Disable secure boot. It may be named that specifically, or it may be implied by a setting for \(dqWindows\(dq vs \(dqOther OS\(dq. Secure boot only works for the \(dqWindows\(dq setting, so choosing other\-OS can be used to disable secure boot. You can move to secure boot later, but disable it now to limit issues.
 .UNINDENT
 .IP 2. 3
 Boot the thumb\-drive ***
@@ -299,7 +299,7 @@ dhcpcd enp3s0
 .IP 4. 3
 Remote install (optional) ***
 .sp
-This facilitatea being able to do the remainder of install remotely. This is commonly used, so I\(aqm including it in the guide.
+This facilitates being able to do the remainder of install remotely. This is commonly used, so I\(aqm including it in the guide.
 .INDENT 3.0
 .IP a. 3
 Add normal user
@@ -318,9 +318,9 @@ Connect remotely to the machine being installed.
 .sp
 Note the IP given given to \fBlivecd\fP in the above step, then ssh to the livecd machine from the machine you wish to continue working from.
 .sp
-If you have a local DHCP server / name server that the live CD gets an IP address from (such as Technitium)  then \fBlivecd\fP may be registered as a host on the network. Otherwise you have to use the machine\(aqs IP address.
+If you have a local DHCP server / name server that the live CD gets an IP address from (such as \fITechnitium\fP)  then \fIlivecd\fP may be registered as a host on the network. Otherwise you have to use the machine\(aqs IP address.
 .sp
-Each time that the livecd is booted, the ssh service will generate a new key to identify itself, so the StrictHostKeyChecking option is to allow connection in this case.
+Each time that the \fIlivecd\fP is booted, the ssh service will generate a new key to identify itself, so the \fIStrictHostKeyChecking\fP option is to allow repeated connections in this case.
 .INDENT 3.0
 .INDENT 3.5
 .sp
@@ -342,7 +342,7 @@ Use \fBlsblk\fP and/or \fBdmesg | grep \(dq\e(sd[a\-z]\e)\e|scsi [0\-9]\(dq\fP t
 .IP b. 3
 Use \fBgdisk\fP to partition the drive
 .IP c. 3
-Use \fBmkfs.fat \-F 32\fP to create boot/efi partition. If the machine already has an EFI partition, then it should be used for the gentoo install \- and no new boot/EFI partition needs to be made. Just be sure to have a backup of that partition (and ideally all other existing partitions that are to be kept). The 1 GB size is sufficient for booting multiple systems, though 200 MB is enough for the Gentoo install.
+Use \fBmkfs.fat \-F 32\fP to create boot/efi partition. If the machine already has an EFI partition, then it should be used for the Gentoo install \- and no new boot/EFI partition needs to be made. Just be sure to have a backup of that partition (and ideally all other existing partitions that are to be kept). The 1 GB size is sufficient for booting multiple systems, though 200 MB is enough for the Gentoo install.
 .IP d. 3
 Use \fBmkfs.ext4\fP to create root and home partitions. The \fBxfs\fP format is now preferred over using ext4 \- adjust as desired.
 .IP e. 3
@@ -366,7 +366,7 @@ All partition values shown below are for example only.
 .IP \(bu 2
 Partitions should be created in order of partition number (e.g. sdb1, sdb2, sdb3, sdb4). Rows below are in the order that they can be mounted.
 .IP \(bu 2
-The root partition size is typical, but can be reduced if space is not available. Generally \(dqsteal\(dq from \fBhome\fP until there is no extra available, then reduce \fBroot\fP as needed afterward.  The minimimum root size is about 10 GB.
+The root partition size is typical, but can be reduced if space is not available. Generally \(dqsteal\(dq from \fBhome\fP until there is no extra available, then reduce \fBroot\fP as needed afterward.  The minimum root size is about 10 GB.
 .IP \(bu 2
 The boot partition (where the kernels are stored and read when booting) is shared by the ESP (EFI system partition) which is what UEFI looks for when booting. The kernel needs to be available outside of the root partition if it is encrypted at some point. UEFI always looks for a \fBEFI\fP directory within the efi partition, and so doesn\(aqt need to be separate from \fI/boot\fP\&.  That is: boot items live in \fB/boot\fP, and efi items live in \fB/boot/EFI\fP\&.
 .UNINDENT
@@ -581,7 +581,6 @@ GENTOO_MIRRORS=\(dqhttps://mirrors.rit.edu/gentoo\(dq
 FEATURES=\(dqgetbinpkg binpkg\-request\-signature\(dq
 ACCEPT_LICENSE=\(dq@FREE @BINARY\-REDISTRIBUTABLE\(dq
 USE=\(dq\-systemd dist\-kernel dracut introspection gstreamer colord gnome\-online\-accounts keyring\(dq
-PYTHON_TARGETS=\(dqpython3_12\(dq
 .EE
 .UNINDENT
 .UNINDENT
@@ -596,7 +595,7 @@ Accept binary licenses
 USE flags \- for best results with binary packages, minimize the number of USE flags you set, but some need to be set. USE flags have multiple purposes
 .INDENT 3.0
 .IP \(bu 2
-choose system options \- this will cause certain software to be chosed and installed without explicitly installing it, as well as configuring that software
+choose system options \- this will cause certain software to be chosen and installed without explicitly installing it, as well as configuring that software
 .IP \(bu 2
 configure / choose between options, in addition to configuring how software should be built.
 .UNINDENT
@@ -605,7 +604,7 @@ configure / choose between options, in addition to configuring how software shou
 Notes/explaination:
 .INDENT 4.0
 .IP \(bu 2
-\fB\-systemd\fP \- \fIsystemd\fP should never be pulled in as a dependancy for another package
+\fB\-systemd\fP \- \fIsystemd\fP should never be pulled in as a dependency for another package
 .IP \(bu 2
 \fBdist\-kernel\fP \- needed when using a pre\-built binary kernel (\fIgentoo\-kernel\-bin\fP)
 .IP \(bu 2
@@ -613,17 +612,13 @@ Notes/explaination:
 .IP \(bu 2
 \fBintrospection gstreamer colord gnome\-online\-accounts keyring\fP is needed for \fIxfce4\-meta\fP and \fIlxdm\fP install to be binary only
 .UNINDENT
-.INDENT 4.0
-.IP 1. 3
-Python targets \- \fIportage\fP the app that controls all the installation of packages in Gentoo is written in Python. This version should match the current version in the binary packages. If it doesn\(aqt, you get a warning about source vs. binary packages when updating \fIportage\fP\&.
-.UNINDENT
 .IP c. 3
 Run \fBgetuto\fP
 .IP d. 3
 Set binhist mirror.
 .INDENT 4.0
 .IP i. 5
-Determine if you machine supports \(dqv3\(dq. Run \fBld.so \-\-help\fP and if it returns saying the x86\-64\-v3 is supported, then use the \fBx86\-64\-v3\fP variant for in the binpackages URL below, otherwise use \fBx86\-64\fP\&.
+Determine if you machine supports \(dqv3\(dq. Run \fBld.so \-\-help\fP and if it returns saying the x86\-64\-v3 is supported, then use the \fBx86\-64\-v3\fP variant for in the \fIbinpackages\fP URL below, otherwise use \fBx86\-64\fP\&.
 .IP ii. 5
 Use \fBlinks\fP to verify URL for binary packages that match the \fBdesktop\fP profile.
 .IP iii. 5
@@ -675,7 +670,7 @@ ln \-sf ../usr/share/zoneinfo/America/New_York localtime
 Locale
 .INDENT 4.0
 .IP a. 3
-Generation \- edit file so it has (only) \fBen_US.UTF\-8 UTF\-8\fP uncommented.
+Generation \- edit file so it has (only) \fBen_US.UTF\-8    UTF\-8\fP uncommented.
 .INDENT 4.0
 .INDENT 3.5
 .sp
@@ -686,7 +681,7 @@ locale\-gen
 .UNINDENT
 .UNINDENT
 .IP b. 3
-Selection \- use \fBeselect\fP to select the \fBen_US.UTF\-8\fP profile
+Selection \- use \fIeselect\fP to select the \fIen_US.UTF\-8\fP profile
 .INDENT 4.0
 .INDENT 3.5
 .sp
@@ -831,12 +826,56 @@ eselect kernel list
 .IP 15. 4
 Bootloader
 .sp
-Install and configure the boot loader. As before, use \fBblkid\fP to view current partitions and their IDs. This UUID should be the UUID of the root (/) partition. \fIrEFInd\fP takes care of adding information for the initrd.
+Install the rEFInd package.
 .INDENT 4.0
 .INDENT 3.5
 .sp
 .EX
 emerge \-\-ask \-\-verbose sys\-boot/refind efibootmgr
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+and configure the boot loader. As before, use \fBblkid\fP to view current partitions and their IDs. This UUID should be the UUID of the root (/) partition. \fIrEFInd\fP takes care of adding information for the initrd.
+.sp
+Install rEFInd to the machine\(aqs UEFI and the EFI directory.
+.INDENT 4.0
+.INDENT 3.5
+.sp
+.EX
+refind\-install
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+Configure rEFInd options
+.INDENT 4.0
+.INDENT 3.5
+.sp
+.EX
+nano /boot/EFI/refind/refind.conf
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+Turn off graphical mode \- you get more information in text mode.
+.sp
+You may need to add \fBdont_scan_volumes\fP configuration list if your drive contains NTFS (Windows partitions), so that those aren\(aqt scanned by rEFInd. These should be either the PARTLABEL or PARTUUID of the partitions listed by \fIblkid\fP and comma separated.
+.INDENT 4.0
+.INDENT 3.5
+.sp
+.EX
+textonly
+dont_scan_volumes \(dqBasic data partition\(dq,f8e9778b\-9f0d\-4908\-96d0\-b3c36991dcdf,cc7089ca\-153f\-4d58\-a9e9\-3e6df22a2234
+.EE
+.UNINDENT
+.UNINDENT
+.sp
+Configure a boot item specifically for Gentoo (in addition to the items that rEFInd will find by scanning). The UUID should be the UUID field of the Gentoo root partition. Note the quotes surround the whole second field, not just the UUID.
+.INDENT 4.0
+.INDENT 3.5
+.sp
+.EX
 blkid >> /boot/refind_linux.conf
 nano /boot/refind_linux.conf
 .EE
@@ -849,16 +888,6 @@ Content
 .sp
 .EX
 \(dqGentoo\(dq \(dqroot=UUID=1651c6f4\-c3fa\-441a\-b0d4\-6509baf19cdd\(dq
-.EE
-.UNINDENT
-.UNINDENT
-.sp
-Then install refind to UEFI
-.INDENT 4.0
-.INDENT 3.5
-.sp
-.EX
-refind\-install
 .EE
 .UNINDENT
 .UNINDENT

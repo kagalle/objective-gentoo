@@ -30,9 +30,9 @@ This guide is meant to be used along with the official `Gentoo handbook <https:/
 
 As the handbook is very detailed, it is easy to "miss the forest in the trees." This guide is meant to limit installation choices and hide some of the complexity and verbosity of the handbook to ease the process, so that important details are not overlooked.
 
-Using the gentoo install media to install the system, but note that a current SystemResuceCD (on a flash-drive) can be very helpful, and can also be used to download and create the gentoo install media as described below.
+Using the Gentoo install media to install the system, but note that a current SystemResuceCD (on a flash-drive) can be very helpful, and can also be used to download and create the Gentoo install media as described below.
 
-The details of partitioning the drive using gdisk are left out of this guide.
+The details of partitioning the drive using `gdisk` are left out of this guide.
 
 Commands shown are **examples** and should be edited if needed.
 
@@ -42,9 +42,9 @@ Commands shown are **examples** and should be edited if needed.
 
 The steps do not need to be done in one session, start to finish. However if you are anywhere between `Boot the live-CD`_ and `Bootloader` you will need to redo all steps marked with ``***`` up to the point where you left off.
 
-----------
-Contraints
-----------
+-----------
+Constraints
+-----------
 
 * x86-64 (AMD64 or Intel 64)
 
@@ -60,7 +60,7 @@ Contraints
 
 * Install media
 
-  Create the Gentoo-minimal-install thumbdrive using an existing linux desktop with a browser available. Other bootable media can be used, but Gentoo's media makes the process more straight forward. It is worth using this method. Also, see the note above about using SystemResuceCD as the existing linux desktop.
+  Create the Gentoo-minimal-install thumb-drive using an existing Linux desktop with a browser available. Other bootable media can be used, but Gentoo's media makes the process more straight forward. It is worth using this method. Also, see the note above about using SystemResuceCD as the existing Linux desktop.
 
 * Downloads from my nearest mirror site
 
@@ -72,13 +72,13 @@ Contraints
 
   GPT goes with UEFI. GPT is not supported with BIOS. MBR partitioning was used for BIOS (and optionally with compatibility mode) instead. GPT works well and has fewer restrictions and more features.
 
-* OpenRC (as apposed to using `systemd` for init)
+* OpenRC (as apposed to using `systemd` for the `init` system)
 
   This a "sensitive" topic - just check the Internet for articles over the last 10 years or more. My success with `systemd` has been less positive than without it, and so I choose to avoid it. This is based strictly my personal opinion. Systemd is a set of software that has enveloped much of the Linux system software. Note that the `init` process is only one area affected by `systemd`. Other areas, especially related to the desktop environment (e.g. elogind) are also `systemd` related, but usable outside of that environment. There are other examples like audio support `pulseaudio`. When I started with Linux, `systemd` didn't exist.
 
 * Desktop profile and matching Stage3 file
 
-  Choice of a profile makes a big difference on how large the final system is and how much software is installed by default. However, for a desktop machine, it is best to use the desktop profile, as all that additional software makes for a lot less manual configuration and a much smoother experience. It is well worth if you want to use a desktop enviroment, like in this case, `xfce4`.
+  Choice of a profile makes a big difference on how large the final system is and how much software is installed by default. However, for a desktop machine, it is best to use the desktop profile, as all that additional software makes for a lot less manual configuration and a much smoother experience. It is well worth if you want to use a desktop environment, like in this case, `xfce4`.
 
 * Use the pre-built Gentoo binary kernel
 
@@ -101,9 +101,9 @@ Contraints
 Create bootable media
 =====================
 
-Using an existing linux installation (or a machine that is started using SystemRescueCD or similar), create a removable thumb-drive that can boot the destination machine. This live-CD environment will contain the scripts and utilities needed to prepare the destination machine to boot Gentoo directly. Existing machines with other operating systems can be used to create this live-CD, but the steps would be somewhat different. The name "live-CD" matches the assigned host-name when the system is running - it can be any sort of removable media, like a CD-ROM or a flash-drive.
+Using an existing Linux installation (or a machine that is started using SystemRescueCD or similar), create a removable thumb-drive that can boot the destination machine. This live-CD environment will contain the scripts and utilities needed to prepare the destination machine to boot Gentoo directly. Existing machines with other operating systems can be used to create this live-CD, but the steps would be somewhat different. The name "live-CD" matches the assigned host-name when the system is running - it can be any sort of removable media, like a CD-ROM or a flash-drive.
  
-#. Manually find your nearest mirror - go to ``https://www.gentoo.org/downloads/mirrors/`` and make note of the https URL of the mirror you choose.
+#. Manually find your nearest mirror - go to ``https://www.gentoo.org/downloads/mirrors/`` and make note of the https:// URL of the mirror you choose.
 
 #. In a browser, go to the nearest mirror
 
@@ -111,7 +111,7 @@ Using an existing linux installation (or a machine that is started using SystemR
 
     http://mirrors.rit.edu/gentoo/releases/amd64/autobuilds/current-install-amd64-minimal/
 
-#. Download latest iso and its asc file. There will several older ``.asc`` files along with the current ``.iso`` and ``.iso.asc``, which is the ones you want (right click, save link as...).
+#. Download latest `.iso` and its `.asc` file. There will be several older `.asc` files along with the current `.iso` and `.iso.asc`, which are the ones you want (right click, save link as...).
 
    ::
 
@@ -119,7 +119,7 @@ Using an existing linux installation (or a machine that is started using SystemR
     install-amd64-minimal-20251116T161545Z.iso.asc
 
 
-#. Verify iso
+#. Verify the `.iso` file
 
    ::
 
@@ -139,7 +139,7 @@ Using an existing linux installation (or a machine that is started using SystemR
     sudo dd if=install-amd64-minimal-20251116T161545Z.iso of=/dev/sdb bs=4096 status=progress
     sudo sync
 
-#. Verify data on thumbdrive. Remove and reinsert the thumbdrive first. Get size of file in bytes from ``ls``, use that in ``cmp`` which should return without any response (if the data on the drive doesn't match, it will tell you).
+#. Verify data on thumb-drive. Remove and reinsert the thumb-drive first. Get size of file in bytes from ``ls``, use that in ``cmp`` which should return without any response (if the data on the drive doesn't match, it will tell you).
 
    ::
 
@@ -154,7 +154,7 @@ Boot the live-CD
    Boot the machine and enter the BIOS setup (by pressing Del, F1, F10, Esc, etc. when initial screen displays)
 
    a. Change the settings for legacy BIOS boot to support UEFI only. We want to use UEFI and doing this will remove all of the legacy boot options from the boot menu selection, which we don't want to be booting anyway.
-   #. Find the setting for "Windows" vs "Other OS" and choose "Windows". This will enable additional options for secure boot which you may want later on.
+   #. Disable secure boot. It may be named that specifically, or it may be implied by a setting for "Windows" vs "Other OS". Secure boot only works for the "Windows" setting, so choosing other-OS can be used to disable secure boot. You can move to secure boot later, but disable it now to limit issues.
 
 #. Boot the thumb-drive \***
 
@@ -192,7 +192,7 @@ Boot the live-CD
 
 #. Remote install (optional) \***
 
-   This facilitatea being able to do the remainder of install remotely. This is commonly used, so I'm including it in the guide.
+   This facilitates being able to do the remainder of install remotely. This is commonly used, so I'm including it in the guide.
 
    a. Add normal user
 
@@ -206,9 +206,9 @@ Boot the live-CD
 
       Note the IP given given to ``livecd`` in the above step, then ssh to the livecd machine from the machine you wish to continue working from.
 
-      If you have a local DHCP server / name server that the live CD gets an IP address from (such as Technitium)  then ``livecd`` may be registered as a host on the network. Otherwise you have to use the machine's IP address.
+      If you have a local DHCP server / name server that the live CD gets an IP address from (such as `Technitium`)  then `livecd` may be registered as a host on the network. Otherwise you have to use the machine's IP address.
 
-      Each time that the livecd is booted, the ssh service will generate a new key to identify itself, so the StrictHostKeyChecking option is to allow connection in this case.
+      Each time that the `livecd` is booted, the ssh service will generate a new key to identify itself, so the `StrictHostKeyChecking` option is to allow repeated connections in this case.
 
       ::
 
@@ -222,7 +222,7 @@ Boot the live-CD
 
    a. Use ``lsblk`` and/or ``dmesg | grep "\(sd[a-z]\)\|scsi [0-9]"`` to determine the drive to install to
    #. Use ``gdisk`` to partition the drive
-   #. Use ``mkfs.fat -F 32`` to create boot/efi partition. If the machine already has an EFI partition, then it should be used for the gentoo install - and no new boot/EFI partition needs to be made. Just be sure to have a backup of that partition (and ideally all other existing partitions that are to be kept). The 1 GB size is sufficient for booting multiple systems, though 200 MB is enough for the Gentoo install.
+   #. Use ``mkfs.fat -F 32`` to create boot/efi partition. If the machine already has an EFI partition, then it should be used for the Gentoo install - and no new boot/EFI partition needs to be made. Just be sure to have a backup of that partition (and ideally all other existing partitions that are to be kept). The 1 GB size is sufficient for booting multiple systems, though 200 MB is enough for the Gentoo install.
    #. Use ``mkfs.ext4`` to create root and home partitions. The ``xfs`` format is now preferred over using ext4 - adjust as desired.
    #. Use ``mkswap`` to create swap partition
 
@@ -237,7 +237,7 @@ Boot the live-CD
 
    * All partition values shown below are for example only.
    * Partitions should be created in order of partition number (e.g. sdb1, sdb2, sdb3, sdb4). Rows below are in the order that they can be mounted.
-   * The root partition size is typical, but can be reduced if space is not available. Generally "steal" from ``home`` until there is no extra available, then reduce ``root`` as needed afterward.  The minimimum root size is about 10 GB.
+   * The root partition size is typical, but can be reduced if space is not available. Generally "steal" from ``home`` until there is no extra available, then reduce ``root`` as needed afterward.  The minimum root size is about 10 GB.
    * The boot partition (where the kernels are stored and read when booting) is shared by the ESP (EFI system partition) which is what UEFI looks for when booting. The kernel needs to be available outside of the root partition if it is encrypted at some point. UEFI always looks for a ``EFI`` directory within the efi partition, and so doesn't need to be separate from `/boot`.  That is: boot items live in ``/boot``, and efi items live in ``/boot/EFI``.
 
    \ 
@@ -342,12 +342,12 @@ Change-root
       #. Accept binary licenses
       #. USE flags - for best results with binary packages, minimize the number of USE flags you set, but some need to be set. USE flags have multiple purposes
 
-         * choose system options - this will cause certain software to be chosed and installed without explicitly installing it, as well as configuring that software
+         * choose system options - this will cause certain software to be chosen and installed without explicitly installing it, as well as configuring that software
          * configure / choose between options, in addition to configuring how software should be built.
 
       Notes/explaination:
 
-      - ``-systemd`` - `systemd` should never be pulled in as a dependancy for another package
+      - ``-systemd`` - `systemd` should never be pulled in as a dependency for another package
       - ``dist-kernel`` - needed when using a pre-built binary kernel (`gentoo-kernel-bin`)
       - ``dracut`` - needed for `installkernel` which configures the boot items after a kernel is installed.
       - ``introspection gstreamer colord gnome-online-accounts keyring`` is needed for `xfce4-meta` and `lxdm` install to be binary only
@@ -355,7 +355,7 @@ Change-root
    #. Run ``getuto``
    #. Set binhist mirror.
 
-      i. Determine if you machine supports "v3". Run ``ld.so --help`` and if it returns saying the x86-64-v3 is supported, then use the ``x86-64-v3`` variant for in the binpackages URL below, otherwise use ``x86-64``.
+      i. Determine if you machine supports "v3". Run ``ld.so --help`` and if it returns saying the x86-64-v3 is supported, then use the ``x86-64-v3`` variant for in the `binpackages` URL below, otherwise use ``x86-64``.
       #. Use ``links`` to verify URL for binary packages that match the ``desktop`` profile.
       #. Edit ``/etc/portage/binrepos.conf/gentobinhost.conf`` accordingly...
 
@@ -386,14 +386,14 @@ Change-root
 
 #. Locale
 
-   a. Generation - edit file so it has (only) ``en_US.UTF-8 UTF-8`` uncommented.
+   a. Generation - edit file so it has (only) ``en_US.UTF-8    UTF-8`` uncommented.
 
       ::
 
        nano locale.gen
        locale-gen
 
-   b. Selection - use ``eselect`` to select the ``en_US.UTF-8`` profile
+   b. Selection - use `eselect` to select the `en_US.UTF-8` profile
 
       ::
 
@@ -494,11 +494,40 @@ Change-root
 
 #. Bootloader
 
-   Install and configure the boot loader. As before, use ``blkid`` to view current partitions and their IDs. This UUID should be the UUID of the root (/) partition. `rEFInd` takes care of adding information for the initrd.
+   Install the rEFInd package.
 
    ::
 
     emerge --ask --verbose sys-boot/refind efibootmgr
+
+   and configure the boot loader. As before, use ``blkid`` to view current partitions and their IDs. This UUID should be the UUID of the root (/) partition. `rEFInd` takes care of adding information for the initrd.
+
+
+   Install rEFInd to the machine's UEFI and the EFI directory.
+
+   ::
+
+    refind-install
+
+   Configure rEFInd options
+
+   ::
+
+    nano /boot/EFI/refind/refind.conf
+
+   Turn off graphical mode - you get more information in text mode.
+
+   You may need to add ``dont_scan_volumes`` configuration list if your drive contains NTFS (Windows partitions), so that those aren't scanned by rEFInd. These should be either the PARTLABEL or PARTUUID of the partitions listed by `blkid` and comma separated.
+
+   ::
+
+    textonly
+    dont_scan_volumes "Basic data partition",f8e9778b-9f0d-4908-96d0-b3c36991dcdf,cc7089ca-153f-4d58-a9e9-3e6df22a2234
+
+   Configure a boot item specifically for Gentoo (in addition to the items that rEFInd will find by scanning). The UUID should be the UUID field of the Gentoo root partition. Note the quotes surround the whole second field, not just the UUID.
+
+   ::
+
     blkid >> /boot/refind_linux.conf
     nano /boot/refind_linux.conf
 
@@ -507,12 +536,6 @@ Change-root
    ::
 
     "Gentoo" "root=UUID=1651c6f4-c3fa-441a-b0d4-6509baf19cdd"
-
-   Then install refind to UEFI
-
-   ::
-
-    refind-install
 
 ---------------
 New Environment

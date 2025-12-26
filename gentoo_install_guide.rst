@@ -375,7 +375,7 @@ Change-root
       ::
 
        emerge --sync
-       emerge --ask --verbose --oneshot --changed-use sys-apps/portage
+       emerge --ask --verbose --oneshot --newuse sys-apps/portage
 
 #. Set time-zone
 
@@ -500,9 +500,6 @@ Change-root
 
     emerge --ask --verbose sys-boot/refind efibootmgr
 
-   and configure the boot loader. As before, use ``blkid`` to view current partitions and their IDs. This UUID should be the UUID of the root (/) partition. `rEFInd` takes care of adding information for the initrd.
-
-
    Install rEFInd to the machine's UEFI and the EFI directory.
 
    ::
@@ -524,7 +521,7 @@ Change-root
     textonly
     dont_scan_volumes "Basic data partition",f8e9778b-9f0d-4908-96d0-b3c36991dcdf,cc7089ca-153f-4d58-a9e9-3e6df22a2234
 
-   Configure a boot item specifically for Gentoo (in addition to the items that rEFInd will find by scanning). The UUID should be the UUID field of the Gentoo root partition. Note the quotes surround the whole second field, not just the UUID.
+   Configure a boot item specifically for Gentoo (in addition to the items that rEFInd will find by scanning). As before, use ``blkid`` to obtain the current partitions and their IDs. The UUID used should be the UUID of the root (/) partition. `rEFInd` takes care of adding information for the initrd. Note the quotes surround the whole second field, not just the UUID.
 
    ::
 

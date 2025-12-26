@@ -650,7 +650,7 @@ Update ebuild repository and portage app
 .sp
 .EX
 emerge \-\-sync
-emerge \-\-ask \-\-verbose \-\-oneshot \-\-changed\-use sys\-apps/portage
+emerge \-\-ask \-\-verbose \-\-oneshot \-\-newuse sys\-apps/portage
 .EE
 .UNINDENT
 .UNINDENT
@@ -836,8 +836,6 @@ emerge \-\-ask \-\-verbose sys\-boot/refind efibootmgr
 .UNINDENT
 .UNINDENT
 .sp
-and configure the boot loader. As before, use \fBblkid\fP to view current partitions and their IDs. This UUID should be the UUID of the root (/) partition. \fIrEFInd\fP takes care of adding information for the initrd.
-.sp
 Install rEFInd to the machine\(aqs UEFI and the EFI directory.
 .INDENT 4.0
 .INDENT 3.5
@@ -871,7 +869,7 @@ dont_scan_volumes \(dqBasic data partition\(dq,f8e9778b\-9f0d\-4908\-96d0\-b3c36
 .UNINDENT
 .UNINDENT
 .sp
-Configure a boot item specifically for Gentoo (in addition to the items that rEFInd will find by scanning). The UUID should be the UUID field of the Gentoo root partition. Note the quotes surround the whole second field, not just the UUID.
+Configure a boot item specifically for Gentoo (in addition to the items that rEFInd will find by scanning). As before, use \fBblkid\fP to obtain the current partitions and their IDs. The UUID used should be the UUID of the root (/) partition. \fIrEFInd\fP takes care of adding information for the initrd. Note the quotes surround the whole second field, not just the UUID.
 .INDENT 4.0
 .INDENT 3.5
 .sp
